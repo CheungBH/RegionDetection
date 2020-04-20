@@ -14,7 +14,7 @@ video_path = config.video_path
 write_box = False
 
 
-class DrownDetector(object):
+class RegionDetector(object):
     def __init__(self, path):
         self.black_yolo = ObjectDetectionYolo()
         self.gray_yolo = ObjectDetectionASFF(cfg="yolo_asff/config/yolov3_baseline.cfg")
@@ -81,5 +81,5 @@ class DrownDetector(object):
 
 
 if __name__ == '__main__':
-    DD = DrownDetector(video_path)
+    DD = RegionDetector(video_path)
     DD.process()

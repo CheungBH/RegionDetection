@@ -10,8 +10,8 @@ import cv2
 import copy
 
 
-video_path = config.video_path
-write_box = False
+video_path = "Video/origin/{}.mp4".format(config.video_num)
+write_box = True
 
 
 class RegionDetector(object):
@@ -60,12 +60,12 @@ class RegionDetector(object):
                     if gray_boxes is not None:
                         gray_img = self.BBV.visualize_gray(gray_boxes, gray_img)
                         if write_box:
-                            gray_bbox = 
+                            gray_bbox = box2str(gray_boxes)
                             self.gray_file.write(gray_bbox)
                             self.gray_file.write("\n")
-                        else:
-                            if write_box:
-                                self.gray_file.write("\n")
+                    else:
+                        if write_box:
+                            self.gray_file.write("\n")
 
                 cv2.imshow("dip_result", dip_img)
                 cv2.imshow("black_result", enhanced)
@@ -81,5 +81,6 @@ class RegionDetector(object):
 
 
 if __name__ == '__main__':
-    DD = RegionDetector(video_path)
-    DD.process()
+    for num in [4,5,19,38,46,48,53]:
+        RD = RegionDetector(video_path)
+        RD.process()

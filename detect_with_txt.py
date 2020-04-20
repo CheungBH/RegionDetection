@@ -8,8 +8,7 @@ import cv2
 import copy
 
 
-gray_path = config.gray_video_path
-video_path = config.video_path
+video_path = "Video/origin/{}.mp4".format(config.video_num)
 
 
 class DrownDetector(object):

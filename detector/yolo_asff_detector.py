@@ -93,6 +93,8 @@ class ObjectDetectionASFF(object):
         im_input = Variable(im_input.type(self.dtype).unsqueeze(0))
         outputs= self.model(im_input) #xc,yc, w, h
         outputs = postprocess(outputs, self.num_class, 0.1, 0.65)
+        if None in outputs:
+            return None, None, None
         outputs = outputs[0].cpu().data
 
         bboxes = outputs[:, 0:4] #x1, y1, x2, y2
@@ -108,14 +110,14 @@ class ObjectDetectionASFF(object):
         #cv2.imwrite(os.path.join(self.cfg['TEST']['SAVED'], img), pred_im)
         #cv2.waitKey(0)
         #cv2.destroyAllWindows()
-        return bboxes.numpy(), cls.numpy(), scores.numpy()
+        return bboxes.tolist(), cls.tolist(), scores.tolist()
 
 
 if __name__ == '__main__':
     img_pth = './example/test/gray'
     cfg = 'config/yolov3_baseline.cfg'
     for img in os.listdir(img_pth):
-        detector = Detector(cfg)
+        detector = ObjectDetectionASFF(cfg)
         img_arr = cv2.imread(os.path.join(img_pth, img))
         bboxes, cls, scores = detector.detect(img_arr)
         print("bboxes: {}, cls: {}, scores: {}".format(bboxes, cls, scores))

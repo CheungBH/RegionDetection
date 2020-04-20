@@ -17,6 +17,5 @@ water_top = 40
 
 # For detection
 video_num = 18
-gray_video_path = "Video/result/gray/{}.avi".format(video_num)
 video_path = "Video/origin/{}.mp4".format(video_num)
 frame_size = (540, 360)

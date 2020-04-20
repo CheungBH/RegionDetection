@@ -10,8 +10,8 @@ import cv2
 import copy
 
 
-video_path = "Video/origin/{}.mp4".format(config.video_num)
-write_box = True
+# video_path = "Video/origin/{}.mp4".format(config.video_num)
+write_box = False
 
 
 class RegionDetector(object):
@@ -81,6 +81,7 @@ class RegionDetector(object):
 
 
 if __name__ == '__main__':
-    for num in [4,5,19,38,46,48,53]:
-        RD = RegionDetector(video_path)
+    for num in [4,5,19,18,38,46,48,53]:
+        print("Processing video {}.avi".format(num))
+        RD = RegionDetector("Video/origin/{}.mp4".format(num))
         RD.process()

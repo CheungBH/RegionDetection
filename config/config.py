@@ -16,6 +16,6 @@ pose_batch = 80
 water_top = 40
 
 # For detection
-video_num = 53
+video_num = 48
 video_path = "Video/origin/{}.mp4".format(video_num)
 frame_size = (540, 360)

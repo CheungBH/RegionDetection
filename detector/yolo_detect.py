@@ -6,7 +6,7 @@ from yolo.darknet import Darknet
 
 
 class ObjectDetectionYolo(object):
-    def __init__(self, batchSize=1, cfg="yolo/cfg/yolov3-spp-1cls.cfg", weights='models/yolo/best_converted.weights'):
+    def __init__(self, batchSize, cfg, weights):
         self.det_model = Darknet(cfg)
         self.det_model.load_weights(weights)
         self.det_model.net_info['height'] = config.input_size
@@ -25,7 +25,6 @@ class ObjectDetectionYolo(object):
         im_name = []
         im_dim_list = []
         img_k, orig_img_k, im_dim_list_k = prep_frame(frame, int(config.input_size))
-
         img.append(img_k)
         orig_img.append(orig_img_k)
         im_name.append('0.jpg')

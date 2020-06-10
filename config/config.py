@@ -2,7 +2,7 @@
 confidence = 0.05
 num_classes = 80
 nms_thresh = 0.33
-input_size = 416
+input_size = 608
 
 # For pose estimation
 input_height = 320
@@ -16,6 +16,6 @@ pose_batch = 80
 water_top = 40
 
 # For detection
-video_num = 53
+video_num = 48
 video_path = "Video/origin/{}.mp4".format(video_num)
-frame_size = (540, 360)
+frame_size = (1280, 720)

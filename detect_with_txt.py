@@ -29,7 +29,6 @@ class DrownDetector(object):
             ret, frame = self.cap.read()
             if ret:
                 frame = cv2.resize(frame, config.frame_size)
-                # gray_frame = cv2.resize(gray_frame, config.frame_size)
                 gray_frame = gray3D(frame)
                 fgmask = self.fgbg.apply(frame)
                 background = self.fgbg.getBackgroundImage()
@@ -52,8 +51,11 @@ class DrownDetector(object):
                         gray_frame = self.BBV.visualize_gray(gray_boxes, gray_frame)
 
                 cv2.imshow("dip_result", dip_img)
+                cv2.moveWindow("dip_result", 0, 200)
                 cv2.imshow("black_result", enhanced)
+                cv2.moveWindow("black_result", 550, 200)
                 cv2.imshow("gray_result", gray_frame)
+                cv2.moveWindow("gray_result", 1100, 200)
 
                 cnt += 1
                 print(cnt)

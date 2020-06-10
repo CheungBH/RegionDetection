@@ -6,7 +6,7 @@ from yolo.darknet import Darknet
 
 
 class ObjectDetectionYolo(object):
-    def __init__(self, batchSize=1, cfg="yolo/cfg/yolov3-spp-1cls.cfg", weights='models/yolo/best_converted.weights'):
+    def __init__(self, batchSize, cfg, weights):
         self.det_model = Darknet(cfg)
         self.det_model.load_weights(weights)
         self.det_model.net_info['height'] = config.input_size

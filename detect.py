@@ -9,10 +9,7 @@ import torch
 import numpy as np
 import cv2
 import copy
-<<<<<<< HEAD
-=======
-# video_path = "Video/origin/{}.mp4".format(config.video_num)
->>>>>>> master
+
 write_box = False
 import sys
 print(sys.path)

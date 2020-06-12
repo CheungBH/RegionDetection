@@ -1,8 +1,17 @@
+<<<<<<< HEAD
 import cv2
 class Region_count:
     def __init__(self):
         self.horizontal = 3
         self.vertical = 4
+=======
+import collections
+import cv2
+class Region_count:
+    def __init__(self):
+        self.horizontal = 4
+        self.vertical = 5
+>>>>>>> master
         self.num = self.horizontal * self.vertical
         self.region = {n: 0 for n in range(self.num)}
         self.region_num = []
@@ -11,6 +20,10 @@ class Region_count:
                 self.region_num.append((i,j))
         self.value_count = [n for n in range(self.num)]
         self.coor_region = dict(zip(self.region_num, self.value_count))
+<<<<<<< HEAD
+=======
+        # self.object_list = []
+>>>>>>> master
     def cal_center_point(self,box):
 
         return (int((box[2]-box[0])/2) + box[0],int((box[3]-box[1])/2) + box[1])
@@ -29,6 +42,15 @@ class Region_count:
                         num = self.coor_region[(j,i)]
                         object_list.append(num)
         return object_list, self.region
+<<<<<<< HEAD
+=======
+                        # print(len(boxes))
+        # increase_frame = len(boxes) +1
+        # self.region[num] +=increase_frame
+        # all except region[num] -1
+
+
+>>>>>>> master
 
     def drawlines(self,img,frame_shape):
         for i in range(self.horizontal - 1):

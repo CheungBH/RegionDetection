@@ -88,7 +88,7 @@ class RegionDetector(object):
                     gray_img = gray3D(frame)
                     # gray_boxes, gray_cls, gray_score = self.gray_yolo.detect(gray_img)
                     orig_img, boxes, scores = self.gray_yolo.process(gray_img)
-                    inps, orig_img, boxes, scores, pt1, pt2 = crop_bbox(frame, boxes, scores)
+                    inps, orig_img, gray_boxes, scores, pt1, pt2 = crop_bbox(frame, boxes, scores)
 
                     # inps1, orig_img1, gray_boxes1, scores1, pt11, pt21 = self.gray_yolo1.process(gray_img)
                     # if gray_boxes1 is not None:

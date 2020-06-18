@@ -19,3 +19,8 @@ water_top = 40
 video_num = 48
 video_path = "Video/origin/{}.mp4".format(video_num)
 frame_size = (540, 360)
+
+black_yolo_cfg = "yolo/cfg/yolov3-spp-1cls.cfg"
+black_yolo_weights = 'models/yolo/best_converted.weights'
+gray_yolo_cfg = "yolo/cfg/prune_0.93_keep_0.1.cfg"
+gray_yolo_weights = 'models/yolo/best.weights'

@@ -9,15 +9,17 @@ import torch
 import numpy as np
 import cv2
 import copy
+from detector.crop_box import crop_bbox
 
 write_box = False
 import sys
 print(sys.path)
 
+
 class RegionDetector(object):
     def __init__(self, path):
-        self.black_yolo = ObjectDetectionYolo(batchSize = 1, cfg="yolo/cfg/yolov3-spp-1cls.cfg", weights='models/yolo/best_converted.weights')
-        self.gray_yolo = ObjectDetectionYolo(batchSize=1, cfg="yolo/cfg/prune_0.93_keep_0.1.cfg", weights='models/yolo/best.weights')
+        self.black_yolo = ObjectDetectionYolo(batchSize = 1, cfg=config.black_yolo_cfg, weights=config.black_yolo_weights)
+        self.gray_yolo = ObjectDetectionYolo(batchSize=1, cfg=config.gray_yolo_cfg, weights=config.gray_yolo_weights)
 
         self.BBV = BBoxVisualizer()
         self.dip_detection = ImageProcessDetection()
@@ -48,7 +50,8 @@ class RegionDetector(object):
                     # black picture
                     enhance_kernel = np.array([[0, -1, 0], [0, 5, 0], [0, -1, 0]])
                     enhanced = cv2.filter2D(diff, -1, enhance_kernel)
-                    inps, orig_img, black_boxes, scores, pt1, pt2 = self.black_yolo.process(enhanced)
+                    orig_img, boxes, scores = self.black_yolo.process(enhanced)
+                    inps, orig_img, black_boxes, scores, pt1, pt2 = crop_bbox(frame, boxes, scores)
                     if black_boxes is not None:
                         object_list, region = self.region_det.determine_within(enhanced.shape,black_boxes)
                         # count region number
@@ -84,8 +87,8 @@ class RegionDetector(object):
                     # gray pics process
                     gray_img = gray3D(frame)
                     # gray_boxes, gray_cls, gray_score = self.gray_yolo.detect(gray_img)
-                    inps, orig_img, gray_boxes, scores, pt1, pt2 = self.gray_yolo.process(gray_img)
-
+                    orig_img, boxes, scores = self.gray_yolo.process(gray_img)
+                    inps, orig_img, boxes, scores, pt1, pt2 = crop_bbox(frame, boxes, scores)
 
                     # inps1, orig_img1, gray_boxes1, scores1, pt11, pt21 = self.gray_yolo1.process(gray_img)
                     # if gray_boxes1 is not None:

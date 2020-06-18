@@ -11,7 +11,6 @@ import copy
 video_path = "Video/origin/{}.mp4".format(config.video_num)
 
 
-
 class DrownDetector(object):
     def __init__(self, path):
         self.BBV = BBoxVisualizer()

@@ -73,5 +73,5 @@ class ObjectDetectionYolo(object):
 
     def process(self, frame):
         img, orig_img, im_name, im_dim_list = self.__video_process(frame)
-        inps, orig_img, boxes, _, scores, pt1, pt2 = self.__get_bbox(img, orig_img, im_name, im_dim_list)
+        inps, orig_img, boxes, scores, _, pt1, pt2 = self.__get_bbox(img, orig_img, im_name, im_dim_list)
         return inps, orig_img, boxes, scores, pt1, pt2

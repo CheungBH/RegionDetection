@@ -97,8 +97,8 @@ class RegionDetector(object):
 
 
 if __name__ == '__main__':
-    # for num in [4,5,18,19,38,46,53,48, "02", "01", "03", "04", "05", "06", "07", "08", "09", "010", '011']:
-    for num in [4]:
+    for num in [4,5,18,19,38,46,53,48, "02", "01", "03", "04", "05", "06", "07", "08", "09", "010", '011']:
+    # for num in [4]:
         print("Processing video {}.avi".format(num))
         RD = RegionDetector("Video/origin/{}.mp4".format(num))
         RD.process()

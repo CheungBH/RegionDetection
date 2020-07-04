@@ -97,6 +97,22 @@ def str2box(string):
         boxes.append([float(i) for i in item.split(" ")])
     return boxes
 
+def score2str(scores):
+    if isinstance(scores, float):
+        return str(scores)
+    string = ""
+    for s in scores:
+        string += str(s)
+        string += ","
+    return string[:-1]
+
+
+def str2score(string):
+    if string == "":
+        return None
+    return [float(item) for item in string.split(",")]
+
+
 
 
 if __name__ == '__main__':

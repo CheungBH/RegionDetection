@@ -18,7 +18,7 @@ print(sys.path)
 
 class RegionDetector(object):
     def __init__(self, path):
-        self.black_yolo = ObjectDetectionYolo(batchSize = 1, cfg=config.black_yolo_cfg, weights=config.black_yolo_weights)
+        self.black_yolo = ObjectDetectionYolo(batchSize=1, cfg=config.black_yolo_cfg, weights=config.black_yolo_weights)
         self.gray_yolo = ObjectDetectionYolo(batchSize=1, cfg=config.gray_yolo_cfg, weights=config.gray_yolo_weights)
 
         self.BBV = BBoxVisualizer()

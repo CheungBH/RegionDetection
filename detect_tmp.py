@@ -22,30 +22,6 @@ class RegionDetector(object):
             self.out_video = cv2.VideoWriter("Video/processed/" + path.split("/")[-1], fourcc, 15,
                                              (frame_size[0]*2, frame_size[1]))
 
-    # def __write_box(self, black, gray):
-    #     (_, gray_boxes, gray_scores) = gray
-    #     if gray_boxes is not None:
-    #         gray_bbox = box2str(gray_boxes.tolist())
-    #         gray_score = score2str(gray_scores.squeeze().tolist())
-    #         self.gray_file.write(gray_bbox)
-    #         self.gray_file.write("\n")
-    #         self.gray_score_file.write(gray_score)
-    #         self.gray_score_file.write("\n")
-    #     else:
-    #         self.gray_file.write("\n")
-    #         self.gray_score_file.write("\n")
-    #
-    #     (_, black_boxes, black_scores) = black
-    #     if black_boxes is not None:
-    #         black_box = box2str(black_boxes.tolist())
-    #         black_score = score2str(black_scores.squeeze().tolist())
-    #         self.black_file.write(black_box)
-    #         self.black_file.write("\n")
-    #         self.black_score_file.write(black_score)
-    #         self.black_score_file.write("\n")
-    #     else:
-    #         self.black_file.write("\n")
-    #         self.black_score_file.write("\n")
 
     def process(self):
         cnt = 0

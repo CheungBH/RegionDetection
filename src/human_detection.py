@@ -2,7 +2,6 @@ import torch
 import numpy as np
 import cv2
 import copy
-from config import config
 
 from config.config import gray_yolo_cfg, gray_yolo_weights, black_yolo_cfg, black_yolo_weights, video_path
 
@@ -41,7 +40,7 @@ class ImgProcessor:
             black_res = self.black_yolo.process(enhanced)
             if black_res is not None:
                 black_boxes, black_scores = self.black_yolo.cut_box_score(black_res)
-                enhanced = self.BBV.visualize(black_boxes, enhanced)
+                enhanced = self.BBV.visualize(black_boxes, enhanced, black_scores)
             black_results = [enhanced, black_boxes, black_scores]
 
             # gray pics process
@@ -49,7 +48,7 @@ class ImgProcessor:
             gray_res = self.gray_yolo.process(gray_img)
             if gray_res is not None:
                 gray_boxes, gray_scores = self.gray_yolo.cut_box_score(gray_res)
-                gray_img = self.BBV.visualize(gray_boxes, gray_img)
+                gray_img = self.BBV.visualize(gray_boxes, gray_img, gray_scores)
             gray_results = [gray_img, gray_boxes, gray_scores]
 
             # boxes, scores = merge_box(gray_boxes, black_boxes, gray_scores, black_scores)

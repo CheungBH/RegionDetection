@@ -2,7 +2,7 @@ import cv2
 from config import config
 from src.human_detection import ImgProcessor
 import numpy as np
-from utils.utils import box2str, score2str, write_file
+from utils.utils import write_file
 
 write_box = True
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
@@ -21,7 +21,6 @@ class RegionDetector(object):
             self.gray_score_file = open("Video/txt/gray_score/{}.txt".format(path.split("/")[-1][:-4]), "w")
             self.out_video = cv2.VideoWriter("Video/processed/" + path.split("/")[-1], fourcc, 15,
                                              (frame_size[0]*2, frame_size[1]))
-
 
     def process(self):
         cnt = 0

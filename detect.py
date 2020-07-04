@@ -1,7 +1,7 @@
-from detector.yolo_detect import ObjectDetectionYolo
-from detector.image_process_detect import ImageProcessDetection
-from detector.yolo_asff_detector import ObjectDetectionASFF
-from detector.visualize import BBoxVisualizer
+from src.detector.yolo_detect import ObjectDetectionYolo
+from src.detector.image_process_detect import ImageProcessDetection
+# from src.detector.yolo_asff_detector import ObjectDetectionASFF
+from src.detector.visualize import BBoxVisualizer
 from config import config
 from utils.utils import gray3D, box2str
 from utils.region_count import Region_count
@@ -9,7 +9,7 @@ import torch
 import numpy as np
 import cv2
 import copy
-from detector.crop_box import crop_bbox
+from src.detector.box_postprocess import crop_bbox
 
 write_box = False
 import sys
@@ -18,8 +18,8 @@ print(sys.path)
 
 class RegionDetector(object):
     def __init__(self, path):
-        self.black_yolo = ObjectDetectionYolo(batchSize=1, cfg=config.black_yolo_cfg, weights=config.black_yolo_weights)
-        self.gray_yolo = ObjectDetectionYolo(batchSize=1, cfg=config.gray_yolo_cfg, weights=config.gray_yolo_weights)
+        self.black_yolo = ObjectDetectionYolo(batchSize=1, cfg=config.black_yolo_cfg, weight=config.black_yolo_weights)
+        self.gray_yolo = ObjectDetectionYolo(batchSize=1, cfg=config.gray_yolo_cfg, weight=config.gray_yolo_weights)
 
         self.BBV = BBoxVisualizer()
         self.dip_detection = ImageProcessDetection()

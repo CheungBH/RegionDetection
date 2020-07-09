@@ -42,7 +42,6 @@ test/data/legacy_serialized.pt
 *~
 .idea
 models
-yolo
 weights
 SPPE
 log

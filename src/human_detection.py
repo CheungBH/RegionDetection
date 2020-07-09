@@ -11,7 +11,7 @@ from src.detector.image_process_detect import ImageProcessDetection
 from src.detector.visualize import BBoxVisualizer
 from src.utils.img import gray3D
 from src.detector.box_postprocess import crop_bbox, merge_box
-
+from utils.region_count import Region_count
 
 class ImgProcessor:
     def __init__(self, show_img=True):
@@ -24,6 +24,7 @@ class ImgProcessor:
         self.img_black = []
         self.show_img = show_img
 
+        self.region_det = Region_count()
     def process_img(self, frame, background):
         black_boxes, black_scores, gray_boxes, gray_scores = None, None, None, None
         diff = cv2.absdiff(frame, background)
@@ -40,6 +41,26 @@ class ImgProcessor:
             black_res = self.black_yolo.process(enhanced)
             if black_res is not None:
                 black_boxes, black_scores = self.black_yolo.cut_box_score(black_res)
+                if black_boxes is not None:
+                    object_list, region = self.region_det.determine_within(enhanced.shape, black_boxes)
+                    for key, value in region.items():
+                        print(region)
+                        if key not in object_list:
+                            if region[key] > 0:
+                                region[key] -= 1
+                            else:
+                                region[key] = 0
+                        else:
+                            region[key] += 1
+                            # only detect region which is processed
+                            if region[key] > 250:
+                                cv2.putText(enhanced, 'HELP!!!!!!', (100, 200), cv2.FONT_HERSHEY_PLAIN, 5, (255, 255, 0), 5)
+                else:
+                    object_list, region = self.region_det.determine_within(enhanced.shape, black_boxes)
+                    for key, value in region.items():
+                        if region[key] > 0:
+                            region[key] -= 1
+                self.region_det.drawlines(enhanced, enhanced.shape)
                 enhanced = self.BBV.visualize(black_boxes, enhanced, black_scores)
             black_results = [enhanced, black_boxes, black_scores]
 

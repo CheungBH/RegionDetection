@@ -4,9 +4,8 @@ import cv2
 
 class Region_count:
     def __init__(self):
-        self.horizontal = 4
-        self.vertical = 5
-
+        self.horizontal = 3
+        self.vertical = 3
         self.num = self.horizontal * self.vertical
         self.region = {n: 0 for n in range(self.num)}
         self.region_num = []

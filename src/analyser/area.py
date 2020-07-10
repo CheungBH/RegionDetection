@@ -7,7 +7,7 @@ import copy
 
 
 class RegionProcessor:
-    def __init__(self, w, h, w_num, h_num, write):
+    def __init__(self, w, h, w_num, h_num, write=False):
         self.height, self.width = h, w
         self.height_num, self.width_num = h_num, w_num
         self.region_cnt = h_num * w_num
@@ -18,7 +18,7 @@ class RegionProcessor:
 
         if self.if_write:
             fourcc = cv2.VideoWriter_fourcc(*'XVID')
-            self.out = cv2.VideoWriter("output2.avi", fourcc, 15, (w*2, h))
+            self.out = cv2.VideoWriter("output2.mp4", fourcc, 15, (w*2, h))
 
         self.keep_ls = []
         self.update_ls = []
@@ -122,7 +122,7 @@ class RegionProcessor:
 
     def draw_cnt_map(self, img):
         for idx, region in self.REGIONS.items():
-            cv2.putText(img, str(region.exists), region.center, cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 255), 1)
+            cv2.putText(img, str(region.exists), region.center, cv2.FONT_HERSHEY_SIMPLEX, 0.8, region.cnt_color(), 1)
 
     def draw_warning_mask(self, img):
         print(self.alarm_ls)

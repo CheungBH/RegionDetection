@@ -9,7 +9,6 @@ fourcc = cv2.VideoWriter_fourcc(*'XVID')
 frame_size = config.frame_size
 
 
-
 class RegionDetector(object):
     def __init__(self, path):
         self.path = path

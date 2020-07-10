@@ -6,9 +6,7 @@ from src.utils.img import gray3D
 import torch
 import numpy as np
 import cv2
-
-
-video_path = "Video/origin/{}.mp4".format(config.video_num)
+from config.config import video_path
 
 
 class DrownDetector(object):

@@ -1,133 +1,60 @@
-from src.detector.yolo_detect import ObjectDetectionYolo
-from src.detector.image_process_detect import ImageProcessDetection
-# from src.detector.yolo_asff_detector import ObjectDetectionASFF
-from src.detector.visualize import BBoxVisualizer
-from config import config
-from utils.utils import gray3D, box2str
-from utils.region_count import Region_count
-import torch
-import numpy as np
 import cv2
-import copy
-from src.detector.box_postprocess import crop_bbox
-
+from config import config
+from src.human_detection import ImgProcessor
+import numpy as np
+from utils.utils import write_file
+import os
 write_box = False
-import sys
-print(sys.path)
+fourcc = cv2.VideoWriter_fourcc(*'XVID')
+frame_size = config.frame_size
+
 
 
 class RegionDetector(object):
     def __init__(self, path):
-        self.black_yolo = ObjectDetectionYolo(batchSize=1, cfg=config.black_yolo_cfg, weight=config.black_yolo_weights)
-        self.gray_yolo = ObjectDetectionYolo(batchSize=1, cfg=config.gray_yolo_cfg, weight=config.gray_yolo_weights)
-
-        self.BBV = BBoxVisualizer()
-        self.dip_detection = ImageProcessDetection()
+        self.path = path
         self.cap = cv2.VideoCapture(path)
         self.fgbg = cv2.createBackgroundSubtractorMOG2(history=500, varThreshold=200, detectShadows=False)
-
-        self.region_det = Region_count()
+        self.IP = ImgProcessor()
         if write_box:
-            self.black_file = open("Video/txt/black/{}.txt".format(path.split("/")[-1][:-4]), "w")
-            self.gray_file = open("Video/txt/gray/{}.txt".format(path.split("/")[-1][:-4]), "w")
+            self.black_file = open("video/txt/black/{}.txt".format(path.split("/")[-1][:-4]), "w")
+            self.gray_file = open("video/txt/gray/{}.txt".format(path.split("/")[-1][:-4]), "w")
+            self.black_score_file = open("video/txt/black_score/{}.txt".format(path.split("/")[-1][:-4]), "w")
+            self.gray_score_file = open("video/txt/gray_score/{}.txt".format(path.split("/")[-1][:-4]), "w")
+            self.out_video = cv2.VideoWriter("video/processed/" + path.split("/")[-1], fourcc, 15,
+                                             (frame_size[0]*2, frame_size[1]))
 
     def process(self):
         cnt = 0
-
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        # out = cv2.VideoWriter('/media/hkuit164/WD20EJRX/Begin with people/video0507/{}'.format(self.path.split('/')[-2]+self.path.split('/')[-1]), fourcc, 20.0, (1440,560))
         while True:
             ret, frame = self.cap.read()
             if ret:
                 frame = cv2.resize(frame, config.frame_size)
                 fgmask = self.fgbg.apply(frame)
                 background = self.fgbg.getBackgroundImage()
-                diff = cv2.absdiff(frame, background)
-                dip_img = copy.deepcopy(frame)
-                dip_box = self.dip_detection.detect_rect(diff)
-                if dip_box:
-                    dip_img = self.BBV.visualize_dip(dip_box, dip_img)
 
-                with torch.no_grad():
-                    # black picture
-                    enhance_kernel = np.array([[0, -1, 0], [0, 5, 0], [0, -1, 0]])
-                    enhanced = cv2.filter2D(diff, -1, enhance_kernel)
-                    orig_img, boxes, scores = self.black_yolo.process(enhanced)
-                    inps, orig_img, black_boxes, scores, pt1, pt2 = crop_bbox(frame, boxes, scores)
-                    if black_boxes is not None:
-                        object_list, region = self.region_det.determine_within(enhanced.shape,black_boxes)
-                        # count region number
-                        for key, value in region.items():
-                            print(region)
-                            if key not in object_list:
-                                if region[key] > 0:
-                                    region[key] -= 1
-                                else:
-                                    region[key] = 0
-                            else:
-                                region[key] += 1
-                                # only detect region which is processed
-                                if region[key] > 400:
-                                    cv2.putText(enhanced, 'HELP!!!!!!', (100, 200), cv2.FONT_HERSHEY_PLAIN, 5, (255, 255, 0),5)
-                    else:
-                        object_list, region = self.region_det.determine_within(enhanced.shape, black_boxes)
-                        for key, value in region.items():
-                            if region[key] > 0:
-                                region[key] -= 1
+                gray_res, black_res, dip_res = self.IP.process_img(frame, background)
 
-                    if black_boxes is not None:
-                        enhanced = self.BBV.visualize_black(black_boxes, enhanced)
-                        if write_box:
-                            enhance_box = box2str(black_boxes.tolist())
-                            self.black_file.write(enhance_box)
-                            self.black_file.write("\n")
-                    else:
-                        if write_box:
-                            self.black_file.write("\n")
+                if write_box:
+                    write_file(gray_res, self.gray_file, self.gray_score_file)
+                    write_file(black_res, self.black_file, self.black_score_file)
 
-
-                    # gray pics process
-                    gray_img = gray3D(frame)
-                    # gray_boxes, gray_cls, gray_score = self.gray_yolo.detect(gray_img)
-                    orig_img, boxes, scores = self.gray_yolo.process(gray_img)
-                    inps, orig_img, gray_boxes, scores, pt1, pt2 = crop_bbox(frame, boxes, scores)
-
-                    # inps1, orig_img1, gray_boxes1, scores1, pt11, pt21 = self.gray_yolo1.process(gray_img)
-                    # if gray_boxes1 is not None:
-                    #     # self.region_det.determine_within(gray_img.shape, gray_boxes, gray_img)
-                    #     gray_img1 = self.BBV.visualize_gray(gray_boxes1, gray_img)
-                    #     if write_box:
-                    #         gray_bbox = box2str(gray_boxes1)
-                    #         self.gray_file.write(gray_bbox)
-                    #         self.gray_file.write("\n")
-                    # else:
-                    #     if write_box:
-                    #         self.gray_file.write("\n")
-                    # gray_img1 = cv2.resize(gray_img1, (1000, 500))
-                    # cv2.imshow("gray_result_train", gray_img1)
-
-                    # print(gray_boxes)
-
-                    if gray_boxes is not None:
-                        # self.region_det.determine_within(gray_img.shape, gray_boxes, gray_img)
-                        gray_img = self.BBV.visualize_gray(gray_boxes, gray_img)
-                        if write_box:
-                            gray_bbox = box2str(gray_boxes)
-                            self.gray_file.write(gray_bbox)
-                            self.gray_file.write("\n")
-                    else:
-                        if write_box:
-                            self.gray_file.write("\n")
-
-
+                # dip_img = cv2.resize(dip_res[0], frame_size)
                 # cv2.imshow("dip_result", dip_img)
-                enhanced = cv2.resize(enhanced,(1000,500))
-                self.region_det.drawlines(enhanced,enhanced.shape)
+                enhanced = cv2.resize(black_res[0], frame_size)
                 cv2.imshow("black_result", enhanced)
-                gray_img = cv2.resize(gray_img, (1000, 500))
-                self.region_det.drawlines(gray_img, gray_img.shape)
+                gray_img = cv2.resize(gray_res[0], frame_size)
                 cv2.imshow("gray_result", gray_img)
 
+                res = np.concatenate((enhanced, gray_img), axis=1)
+                cv2.imshow("res", res)
+
+                if write_box:
+                    self.out_video.write(res)
+                # out.write(res)
                 cnt += 1
-                # print(cnt)
                 cv2.waitKey(10)
             else:
                 self.cap.release()
@@ -136,8 +63,9 @@ class RegionDetector(object):
 
 
 if __name__ == '__main__':
-    # for num in [4,5,19,18,38,46,48,53]:
-    #     print("Processing video {}.avi".format(num))
-    num = 4
-    RD = RegionDetector("./Video/origin/{}.mp4".format(num))
+    # for path in os.listdir(config.video_path):
+    #     for name in os.listdir(config.video_path+'/'+path):
+    #         aa = config.video_path+'/'+path+'/'+name
+    #         print(aa)
+    RD = RegionDetector(config.video_path)
     RD.process()

@@ -1,9 +1,18 @@
 device = "cuda:0"
 
-black_yolo_cfg = "weights/yolo/0710/black/yolov3-spp-1cls.cfg"
-black_yolo_weights = 'weights/yolo/0710/black/150_416_best.weights'
-gray_yolo_cfg = "weights/yolo/0710/gray/yolov3-spp-1cls.cfg"
-gray_yolo_weights = 'weights/yolo/0710/gray/135_608_best.weights'
+gray_yolo_cfg = "model/gray/prune_0.93_keep_0.1.cfg"
+gray_yolo_weights = "model/gray/best.weights"
+black_yolo_cfg = "model/black/yolov3-spp-1cls.cfg"
+black_yolo_weights = "model/black/best_converted.weights"
+rgb_yolo_cfg = ""
+rgb_yolo_weights = ""
+
+video_path = "video/underwater/multiple.mp4"
+water_top = 40
+
+'''
+----------------------------------------------------------------------------------------------------------------
+'''
 
 # For yolo
 confidence = 0.05
@@ -20,11 +29,7 @@ fast_inference = True
 pose_batch = 80
 
 
-water_top = 40
-
 # For detection
-
-video_path = "video/0710/0048.mp4"
 frame_size = (720, 540)
 
 black_box_threshold = 0.3

@@ -14,6 +14,7 @@ from src.utils.img import gray3D
 from src.detector.box_postprocess import crop_bbox, merge_box
 from src.analyser.area import RegionProcessor
 
+
 class ImgProcessor:
     def __init__(self, show_img=True):
         self.black_yolo = ObjectDetectionYolo(cfg=black_yolo_cfg, weight=black_yolo_weights)
@@ -54,7 +55,7 @@ class ImgProcessor:
 
             gray_results = [gray_img, gray_boxes, gray_scores]
 
-            cnt_img, fr = self.RP.process_box(gray_boxes, frame)
+            res = self.RP.process_box(gray_boxes, frame)
 
             # boxes, scores = merge_box(gray_boxes, black_boxes, gray_scores, black_scores)
             # if gray_res is not None:

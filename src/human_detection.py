@@ -43,7 +43,7 @@ class ImgProcessor:
             black_res = self.black_yolo.process(enhanced)
             if black_res is not None:
                 black_boxes, black_scores = self.black_yolo.cut_box_score(black_res)
-                enhanced = self.BBV.visualize(black_boxes, enhanced)
+                enhanced = self.BBV.visualize(black_boxes, enhanced, black_scores)
             black_results = [enhanced, black_boxes, black_scores]
 
             # gray pics process

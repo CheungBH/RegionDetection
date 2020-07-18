@@ -27,6 +27,7 @@ class RegionDetector(object):
             self.out_video = cv2.VideoWriter("output.mp4", cv2.VideoWriter_fourcc(*'XVID'), 15, (2160, 1080))
 
     def process(self):
+        self.IP.object_tracker.init_tracker()
         cnt = 0
         # fourcc = cv2.VideoWriter_fourcc(*'XVID')
         while True:
@@ -51,7 +52,7 @@ class RegionDetector(object):
                 cv2.waitKey(1)
             else:
                 self.cap.release()
-                # self.out_video.release()
+                self.out_video.release()
                 cv2.destroyAllWindows()
                 # self.IP.RP.out.release()
                 break
@@ -80,4 +81,4 @@ if __name__ == '__main__':
         RD.process()
 
         # shutil.copy("output2.mp4", os.path.join(dest_folder, "rd_" + v_name))
-        shutil.copy("output.mp4", os.path.join(dest_folder, v_name))
+        shutil.move("output.mp4", os.path.join(dest_folder, v_name))

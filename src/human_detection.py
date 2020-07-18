@@ -38,7 +38,6 @@ class ImgProcessor:
         self.show_img = show_img
         self.RP = RegionProcessor(config.frame_size[0], config.frame_size[1], 10, 10)
         self.HP = HumanProcessor()
-        # self.out = cv2.VideoWriter("output.mp4", fourcc, 12, (1440, 540))
 
     def process_img(self, frame, background):
         black_boxes, black_scores, gray_boxes, gray_scores = None, None, None, None

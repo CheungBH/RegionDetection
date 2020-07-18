@@ -62,31 +62,6 @@ class RegionProcessor:
             if occupy_range:
                 occupy_region += occupy_range
         return center_region, cover_region, occupy_region
-    #
-    # def center_region(self, boxes):
-    #     center_region = []
-    #     for box in boxes:
-    #         center = cal_center_point(box)
-    #         center_region.append(self.locate(center))
-    #     return center_region
-    #
-    # def cover_region(self, boxes):
-    #     cover_region = []
-    #     for box in boxes:
-    #         tl, br = (box[0], box[1]), (box[2], box[3])
-    #         cover_range = self.locate_cover(tl, br)
-    #         if cover_range:
-    #             cover_region += cover_range
-    #     return cover_region
-    #
-    # def occupy_region(self, boxes):
-    #     occupy_region = []
-    #     for box in boxes:
-    #         tl, br = (box[0], box[1]), (box[2], box[3])
-    #         occupy_range = self.locate_occupy(tl, br)
-    #         if occupy_range:
-    #             occupy_region += occupy_range
-    #     return occupy_region
 
     def region_process(self, occupy, cover, center):
         for idx in self.REGIONS.keys():

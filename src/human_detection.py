@@ -34,7 +34,7 @@ class ImgProcessor:
         self.id2bbox = {}
         self.img_black = []
         self.show_img = show_img
-        self.RP = RegionProcessor(config.frame_size[0], config.frame_size[1], 10, 10, write=True)
+        self.RP = RegionProcessor(config.frame_size[0], config.frame_size[1], 10, 10)
         self.out = cv2.VideoWriter("output.mp4", fourcc, 12, (1440, 540))
 
     def process_img(self, frame, background):
@@ -74,10 +74,4 @@ class ImgProcessor:
                 boxes = None
             res = self.RP.process_box(boxes, frame)
 
-            # boxes, scores = merge_box(gray_boxes, black_boxes, gray_scores, black_scores)
-            # if gray_res is not None:
-            #     tracked_object = self.object_tracker.track_box_with_high_conf(gray_res)
-            #     gray_img = self.IDV.plot_bbox_id(tracked_object, gray_img)
-
-            # inps, pt1, pt2 = crop_bbox(frame, boxes)
         return gray_results, black_results, dip_results, res

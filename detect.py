@@ -6,8 +6,9 @@ from utils.utils import write_file
 import os
 write_box = False
 write_video = True
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
+
 frame_size = config.frame_size
+store_size = config.store_size
 
 
 class RegionDetector(object):
@@ -21,10 +22,9 @@ class RegionDetector(object):
             self.gray_file = open("video/txt/gray/{}.txt".format(path.split("/")[-1][:-4]), "w")
             self.black_score_file = open("video/txt/black_score/{}.txt".format(path.split("/")[-1][:-4]), "w")
             self.gray_score_file = open("video/txt/gray_score/{}.txt".format(path.split("/")[-1][:-4]), "w")
-            # self.out_video = cv2.VideoWriter("video/processed/" + path.split("/")[-1], fourcc, 15,
-            #                                  (frame_size[0]*2, frame_size[1]))
+
         if write_video:
-            self.out_video = cv2.VideoWriter("output.mp4", fourcc, 15, (frame_size[0]*2, frame_size[1]))
+            self.out_video = cv2.VideoWriter("output.mp4", cv2.VideoWriter_fourcc(*'XVID'), 15, store_size)
 
     def process(self):
         cnt = 0
@@ -48,11 +48,11 @@ class RegionDetector(object):
                 enhanced = cv2.resize(black_res[0], frame_size)
                 # cv2.imshow("black_result", enhanced)
                 gray_img = cv2.resize(gray_res[0], frame_size)
-                # cv2.imshow("gray_result", g1ray_img)
+                # cv2.imshow("gray_result", gray_img)
 
                 yolo_map = np.concatenate((enhanced, gray_img), axis=1)
                 res = np.concatenate((yolo_map, rd_map), axis=0)
-                res = cv2.resize(res, (1440, 860))
+                res = cv2.resize(res, store_size)
                 cv2.imshow("res", res)
 
                 if write_video:
@@ -64,7 +64,7 @@ class RegionDetector(object):
                 self.cap.release()
                 self.out_video.release()
                 cv2.destroyAllWindows()
-                self.IP.RP.out.release()
+                # self.IP.RP.out.release()
                 break
 
 

@@ -31,6 +31,7 @@ pose_batch = 80
 
 # For detection
 frame_size = (720, 540)
+store_size = (frame_size[0]*2, frame_size[1]*2)
 
 black_box_threshold = 0.3
 gray_box_threshold = 0.3

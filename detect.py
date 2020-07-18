@@ -52,7 +52,7 @@ class RegionDetector(object):
 
                 yolo_map = np.concatenate((enhanced, gray_img), axis=1)
                 res = np.concatenate((yolo_map, rd_map), axis=0)
-                cv2.resize(res, (1440, 720))
+                res = cv2.resize(res, (1440, 860))
                 cv2.imshow("res", res)
 
                 if write_video:

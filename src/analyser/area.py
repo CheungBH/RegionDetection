@@ -47,30 +47,46 @@ class RegionProcessor:
         br = self.locate(pt_br)
         return [(i, j) for i in range(tl[0], br[0]+1) for j in range(tl[1], br[1]+1)]
 
-    def center_region(self, boxes):
-        center_region = []
+    def region_classify(self, boxes):
+        center_region, cover_region, occupy_region = [], [], []
         for box in boxes:
             center = cal_center_point(box)
             center_region.append(self.locate(center))
-        return center_region
 
-    def cover_region(self, boxes):
-        cover_region = []
-        for box in boxes:
             tl, br = (box[0], box[1]), (box[2], box[3])
             cover_range = self.locate_cover(tl, br)
             if cover_range:
                 cover_region += cover_range
-        return cover_region
 
-    def occupy_region(self, boxes):
-        occupy_region = []
-        for box in boxes:
-            tl, br = (box[0], box[1]), (box[2], box[3])
             occupy_range = self.locate_occupy(tl, br)
             if occupy_range:
                 occupy_region += occupy_range
-        return occupy_region
+        return center_region, cover_region, occupy_region
+    #
+    # def center_region(self, boxes):
+    #     center_region = []
+    #     for box in boxes:
+    #         center = cal_center_point(box)
+    #         center_region.append(self.locate(center))
+    #     return center_region
+    #
+    # def cover_region(self, boxes):
+    #     cover_region = []
+    #     for box in boxes:
+    #         tl, br = (box[0], box[1]), (box[2], box[3])
+    #         cover_range = self.locate_cover(tl, br)
+    #         if cover_range:
+    #             cover_region += cover_range
+    #     return cover_region
+    #
+    # def occupy_region(self, boxes):
+    #     occupy_region = []
+    #     for box in boxes:
+    #         tl, br = (box[0], box[1]), (box[2], box[3])
+    #         occupy_range = self.locate_occupy(tl, br)
+    #         if occupy_range:
+    #             occupy_region += occupy_range
+    #     return occupy_region
 
     def region_process(self, occupy, cover, center):
         for idx in self.REGIONS.keys():
@@ -101,9 +117,10 @@ class RegionProcessor:
         self.clear()
         self.img = copy.deepcopy(fr)
         if boxes is not None:
-            occupy_ls = self.occupy_region(boxes)
-            cover_ls = self.cover_region(boxes)
-            center_ls = self.center_region(boxes)
+            # occupy_ls = self.occupy_region(boxes)
+            # cover_ls = self.cover_region(boxes)
+            # center_ls = self.center_region(boxes)
+            center_ls, cover_ls, occupy_ls = self.region_classify(boxes)
             self.region_process(occupy_ls, cover_ls, center_ls)
         else:
             self.empty_ls = self.region_idx
@@ -134,8 +151,9 @@ class RegionProcessor:
         im_black = cv2.resize(im_black, (self.width, self.height))
         self.Visualize.draw_cnt_map(im_black, self.REGIONS)
 
-        self.Visualize.draw_box(boxes, img)
-        self.Visualize.draw_center_point(boxes, img)
+        if boxes is not None:
+            self.Visualize.draw_box(boxes, img)
+            self.Visualize.draw_center_point(boxes, img)
         self.Visualize.draw_boundary(img)
         self.Visualize.draw_warning_mask(img, self.REGIONS, self.alarm_ls)
         res = np.concatenate((im_black, img), axis=1)

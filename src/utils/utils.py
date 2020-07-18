@@ -30,5 +30,22 @@ def image_normalize(img_name, size=224):
     image_tensor = torch.from_numpy(image_array).float()
     return image_tensor
 
+
+def cut_image_box(img, bottom=0, top=0, left=0, right=0):
+    return np.asarray(img[top: bottom, left: right])
+
+
 def cal_center_point(box):
     return int((box[2] - box[0]) / 2) + box[0], int((box[3] - box[1]) / 2) + box[1]
+
+
+def paste_box(frame, black, boxes):
+    for box in boxes:
+        x1, y1, x2, y2 = int(box[0]), int(box[1]), int(box[2]), int(box[3])
+        x1 = 0 if x1 < 0 else x1
+        y1 = 0 if y1 < 0 else y1
+        x2 = frame.shape[1] if x2 > frame.shape[1] else x2
+        y2 = frame.shape[0] if y2 > frame.shape[0] else y2
+        img = cut_image_box(frame, left=x1, top=y1, right=x2, bottom=y2)
+        black[y1:y2, x1:x2, :] = img
+    return black

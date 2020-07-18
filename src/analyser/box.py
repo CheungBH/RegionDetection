@@ -43,6 +43,6 @@ class Box:
         return cal_center_point(self.curr_box)
 
     def vis_size(self, img, idx, num):
-        cv2.putText(img, "id{}".format(idx), (30 + 250*num, 40), cv2.FONT_ITALIC, 0.8, (0, 255, 255), 2)
+        cv2.putText(img, "id{}".format(idx), (30 + 160*num, 40), cv2.FONT_ITALIC, 0.8, (0, 255, 255), 2)
         for i, item in enumerate(self.ratios.tolist()[::-1]):
-            cv2.putText(img, "f-{}: {}".format(i, round(item, 2)), (30 + 250*num, + 100+ 40*i), cv2.FONT_HERSHEY_SIMPLEX, 0.8, self.text_color(item), 1)
+            cv2.putText(img, "f-{}: {}".format(i, round(item, 2)), (30 + 160*num, + 100+ 40*i), cv2.FONT_HERSHEY_SIMPLEX, 0.8, self.text_color(item), 1)

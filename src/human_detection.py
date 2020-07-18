@@ -13,6 +13,7 @@ from src.tracker.track import ObjectTracker
 from src.tracker.visualize import IDVisualizer
 from src.analyser.area import RegionProcessor
 from src.analyser.humans import HumanProcessor
+from src.utils.utils import paste_box
 
 try:
     from config.config import gray_yolo_cfg, gray_yolo_weights, black_yolo_cfg, black_yolo_weights, video_path
@@ -41,6 +42,7 @@ class ImgProcessor:
 
     def process_img(self, frame, background):
         black_boxes, black_scores, gray_boxes, gray_scores = None, None, None, None
+        frame_tmp = copy.deepcopy(frame)
         diff = cv2.absdiff(frame, background)
         dip_img = copy.deepcopy(frame)
         dip_boxes = self.dip_detection.detect_rect(diff)
@@ -77,6 +79,7 @@ class ImgProcessor:
                 self.IDV.plot_bbox_id(self.id2bbox, frame)
                 self.IDV.plot_bbox_id(self.id2bbox, img_black)
                 self.BBV.visualize(boxes, img_black)
+                img_black = paste_box(frame_tmp, img_black, boxes)
                 self.HP.update(self.id2bbox)
             else:
                 boxes = None

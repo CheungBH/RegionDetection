@@ -62,22 +62,22 @@ if __name__ == '__main__':
     #     for name in os.listdir(config.video_path+'/'+path):
     #         aa = config.video_path+'/'+path+'/'+name
     #         print(aa)
-    RD = RegionDetector(config.video_path)
-    RD.process()
+    # RD = RegionDetector(config.video_path)
+    # RD.process()
 
     import shutil
-    # import os
-    # # src = "video/619_Big Group"
-    # # for folder in os.listdir(src):
-    # # video_folder = os.path.join(src, folder)
-    # video_folder = "video/test"
-    # dest_folder = video_folder + "_processed"
-    # os.makedirs(dest_folder, exist_ok=True)
-    #
-    # for v_name in os.listdir(video_folder):
-    #     video = os.path.join(video_folder, v_name)
-    #     RD = RegionDetector(video)
-    #     RD.process()
+    import os
+    # src = "video/619_Big Group"
+    # for folder in os.listdir(src):
+    # video_folder = os.path.join(src, folder)
+    video_folder = "D:/0619_BIG"
+    dest_folder = video_folder + "_6img_res"
+    os.makedirs(dest_folder, exist_ok=True)
+
+    for v_name in os.listdir(video_folder):
+        video = os.path.join(video_folder, v_name)
+        RD = RegionDetector(video)
+        RD.process()
 
         # shutil.copy("output2.mp4", os.path.join(dest_folder, "rd_" + v_name))
-        # shutil.copy("output.mp4", os.path.join(dest_folder, v_name))
+        shutil.copy("output.mp4", os.path.join(dest_folder, v_name))

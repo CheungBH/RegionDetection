@@ -2,6 +2,7 @@ from .people import Person
 import cv2
 from config.config import frame_size
 import numpy as np
+from src.utils.utils import paste_box
 
 
 class HumanProcessor:
@@ -45,6 +46,7 @@ class HumanProcessor:
             h, w = self.PEOPLE[idx].BOX.cal_curr_hw()
             cv2.putText(im_box, "{}".format(round((h/w).tolist(), 4)), self.PEOPLE[idx].BOX.curr_center(),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 255), 2)
+
 
         # cv2.imshow("box size", img_black)
         im_box = cv2.resize(im_box, frame_size)

@@ -12,6 +12,7 @@ from src.detector.box_postprocess import crop_bbox, merge_box, filter_box
 from src.tracker.track import ObjectTracker
 from src.tracker.visualize import IDVisualizer
 from src.analyser.area import RegionProcessor
+from src.analyser.humans import HumanProcessor
 
 try:
     from config.config import gray_yolo_cfg, gray_yolo_weights, black_yolo_cfg, black_yolo_weights, video_path
@@ -35,7 +36,8 @@ class ImgProcessor:
         self.img_black = []
         self.show_img = show_img
         self.RP = RegionProcessor(config.frame_size[0], config.frame_size[1], 10, 10)
-        self.out = cv2.VideoWriter("output.mp4", fourcc, 12, (1440, 540))
+        self.HP = HumanProcessor()
+        # self.out = cv2.VideoWriter("output.mp4", fourcc, 12, (1440, 540))
 
     def process_img(self, frame, background):
         black_boxes, black_scores, gray_boxes, gray_scores = None, None, None, None
@@ -70,6 +72,8 @@ class ImgProcessor:
             if gray_res is not None:
                 self.id2bbox = self.object_tracker.track(gray_res)
                 boxes = self.object_tracker.id_and_box(self.id2bbox)
+                self.IDV.plot_bbox_id(self.id2bbox, frame)
+                self.HP.update_box(self.id2bbox)
             else:
                 boxes = None
             res = self.RP.process_box(boxes, frame)

@@ -41,7 +41,7 @@ class HumanProcessor:
         img_cnt = cv2.resize(img_cnt, frame_size)
         curr = sorted(self.curr_id)
         for num, idx in enumerate(curr):
-            self.PEOPLE[idx].BOX.vis_box_size(img_cnt, idx, num)
+            self.PEOPLE[idx].BOX.vis_size(img_cnt, idx, num)
             h, w = self.PEOPLE[idx].BOX.cal_curr_hw()
             cv2.putText(im_box, "{}".format(round((h/w).tolist(), 4)), self.PEOPLE[idx].BOX.curr_center(),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 255), 2)

@@ -24,7 +24,7 @@ class RegionDetector(object):
             self.gray_score_file = open("video/txt/gray_score/{}.txt".format(path.split("/")[-1][:-4]), "w")
 
         if write_video:
-            self.out_video = cv2.VideoWriter("output.mp4", cv2.VideoWriter_fourcc(*'XVID'), 15, (1440, 720))
+            self.out_video = cv2.VideoWriter("output.mp4", cv2.VideoWriter_fourcc(*'XVID'), 15, (2160, 1080))
 
     def process(self):
         cnt = 0

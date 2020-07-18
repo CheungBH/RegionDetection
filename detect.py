@@ -37,7 +37,7 @@ class RegionDetector(object):
                 fgmask = self.fgbg.apply(frame)
                 background = self.fgbg.getBackgroundImage()
 
-                gray_res, black_res, dip_res = self.IP.process_img(frame, background)
+                gray_res, black_res, dip_res, rd_map = self.IP.process_img(frame, background)
 
                 if write_box:
                     write_file(gray_res, self.gray_file, self.gray_score_file)
@@ -50,7 +50,9 @@ class RegionDetector(object):
                 gray_img = cv2.resize(gray_res[0], frame_size)
                 # cv2.imshow("gray_result", g1ray_img)
 
-                res = np.concatenate((enhanced, gray_img), axis=1)
+                yolo_map = np.concatenate((enhanced, gray_img), axis=1)
+                res = np.concatenate((yolo_map, rd_map), axis=0)
+                cv2.resize(res, (1440, 720))
                 cv2.imshow("res", res)
 
                 if write_video:

@@ -80,4 +80,4 @@ class ImgProcessor:
             #     gray_img = self.IDV.plot_bbox_id(tracked_object, gray_img)
 
             # inps, pt1, pt2 = crop_bbox(frame, boxes)
-        return gray_results, black_results, dip_results
+        return gray_results, black_results, dip_results, res

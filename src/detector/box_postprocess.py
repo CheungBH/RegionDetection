@@ -64,7 +64,13 @@ def merge_box(gray_box, black_box, gray_scores, black_scores):
 
 def filter_box(boxes, scores, thresh=0.3):
     keep_ls = []
-    for idx, s in enumerate(scores):
-        if s > thresh:
+    for idx, (b, s) in enumerate(zip(boxes, scores)):
+        if s > thresh and right_distance(b[0], b[2]) and right_distance(b[1], b[3]):
             keep_ls.append(idx)
     return boxes[keep_ls], scores[keep_ls]
+
+
+def right_distance(a, b):
+    if abs(a-b) > 10:
+        return True
+    return False

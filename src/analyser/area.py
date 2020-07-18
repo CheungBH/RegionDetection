@@ -111,7 +111,7 @@ class RegionProcessor:
         self.trigger_alarm(fr)
 
         res = self.visualize(boxes, fr)
-        cv2.imshow("result", res)
+        # cv2.imshow("result", res)
         if self.if_write:
             self.out.write(res)
         return res

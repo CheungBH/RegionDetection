@@ -68,16 +68,25 @@ class ImgProcessor:
                 gray_boxes, gray_scores = filter_box(gray_boxes, gray_scores, config.gray_box_threshold)
 
             gray_results = [gray_img, gray_boxes, gray_scores]
+            img_black = cv2.imread("src/black.jpg")
+            img_black = cv2.resize(img_black, config.frame_size)
 
             if gray_res is not None:
                 self.id2bbox = self.object_tracker.track(gray_res)
                 boxes = self.object_tracker.id_and_box(self.id2bbox)
                 self.IDV.plot_bbox_id(self.id2bbox, frame)
+                self.IDV.plot_bbox_id(self.id2bbox, img_black)
+                self.BBV.visualize(boxes, img_black)
                 self.HP.update(self.id2bbox)
             else:
                 boxes = None
 
-            res = self.RP.process_box(boxes, frame)
-            box_res = self.HP.vis_box_size()
+            rd_map = self.RP.process_box(boxes, frame)
+            box_map = self.HP.vis_box_size(img_black)
+            yolo_map = np.concatenate((enhanced, gray_img), axis=1)
+            yolo_cnt_map = np.concatenate((yolo_map, rd_map), axis=0)
+            res = np.concatenate((yolo_cnt_map, box_map), axis=1)
+
+            # cv2.imshow("black_box", img_black)
 
         return gray_results, black_results, dip_results, res

@@ -13,8 +13,10 @@ class Box:
         self.boxes = box.unsqueeze(dim=0)
         self.centers = [cal_center_point(box)]
         self.ratios = []
+        self.curr_box = box
 
     def append(self, box):
+        self.curr_box = box
         self.boxes = torch.cat([self.boxes, box.unsqueeze(dim=0)], dim=0)
         self.centers.append(cal_center_point(box))
         if len(self) > max_box_store:
@@ -30,14 +32,17 @@ class Box:
         print(self.ratios)
         return True if sum((self.ratios > box_ratio_thresh).float())/len(self.ratios) >= hw_percent_ratio else False
 
-    def cal_curr_hw(self, box):
-        h, w = box[3] - box[1], box[2] - box[0]
-        # print("Height ")
+    def cal_curr_hw(self):
+        h, w = self.curr_box[3] - self.curr_box[1], self.curr_box[2] - self.curr_box[0]
+        return h, w
 
     def text_color(self, r):
         return (0, 255, 255) if r > box_ratio_thresh else (255, 255, 0)
 
+    def curr_center(self):
+        return cal_center_point(self.curr_box)
+
     def vis_box_size(self, img, idx, num):
         cv2.putText(img, "id{}".format(idx), (30 + 250*num, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 1)
         for i, item in enumerate(self.ratios.tolist()[::-1]):
-            cv2.putText(img, "ratio-{}: {}".format(i, round(item, 4)), (30 + 250*num, + 100+ 50*i), cv2.FONT_HERSHEY_SIMPLEX, 0.8, self.text_color(item), 1)
+            cv2.putText(img, "ratio-{}: {}".format(i, round(item, 4)), (30 + 250*num, + 100+ 50*i), cv2.FONT_HERSHEY_SIMPLEX, 1, self.text_color(item), 1)

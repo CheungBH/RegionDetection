@@ -5,7 +5,7 @@ import numpy as np
 from utils.utils import write_file
 
 write_box = False
-write_video = False
+write_video = True
 
 frame_size = config.frame_size
 store_size = config.store_size
@@ -36,23 +36,19 @@ class RegionDetector(object):
                 fgmask = self.fgbg.apply(frame)
                 background = self.fgbg.getBackgroundImage()
 
-                gray_res, black_res, dip_res, rd_map = self.IP.process_img(frame, background)
+                gray_res, black_res, dip_res, res_map = self.IP.process_img(frame, background)
 
                 if write_box:
                     write_file(gray_res, self.gray_file, self.gray_score_file)
                     write_file(black_res, self.black_file, self.black_score_file)
 
                 # dip_img = cv2.resize(dip_res[0], frame_size)
-                enhanced = cv2.resize(black_res[0], frame_size)
-                gray_img = cv2.resize(gray_res[0], frame_size)
 
-                yolo_map = np.concatenate((enhanced, gray_img), axis=1)
-                res = np.concatenate((yolo_map, rd_map), axis=0)
-                res = cv2.resize(res, store_size)
-                cv2.imshow("res", res)
 
                 if write_video:
-                    self.out_video.write(res)
+                    self.out_video.write(res_map)
+
+                cv2.imshow("res", cv2.resize(res_map, (1440, 720)))
                 # out.write(res)
                 cnt += 1
                 cv2.waitKey(1)

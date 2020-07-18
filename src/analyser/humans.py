@@ -1,6 +1,7 @@
 from .people import Person
 import cv2
 from config.config import frame_size
+import numpy as np
 
 
 class HumanProcessor:
@@ -35,10 +36,14 @@ class HumanProcessor:
         self.update_untracked()
         # self.vis_box_size()
 
-    def vis_box_size(self, fr):
-        img_black = cv2.imread("src/black.jpg")
+    def vis_box_size(self, im_box):
+        img_cnt = cv2.imread("src/black.jpg")
         for num, idx in enumerate(self.curr_id):
-            self.PEOPLE[idx].BOX.vis_box_size(img_black, idx, num)
+            self.PEOPLE[idx].BOX.vis_box_size(img_cnt, idx, num)
+            h, w = self.PEOPLE[idx].BOX.cal_curr_hw()
+            cv2.putText(im_box, "{}".format(round((h/w).tolist(), 4)), self.PEOPLE[idx].BOX.curr_center(), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 255), 1)
 
         # cv2.imshow("box size", img_black)
-        return cv2.resize(img_black, frame_size)
+        im_box = cv2.resize(im_box, frame_size)
+        img_cnt = cv2.resize(img_cnt, frame_size)
+        return np.concatenate((img_cnt, im_box), axis=0)

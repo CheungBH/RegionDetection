@@ -1,4 +1,6 @@
 from .people import Person
+import cv2
+from config.config import frame_size
 
 
 class HumanProcessor:
@@ -21,7 +23,7 @@ class HumanProcessor:
                 self.stored_id.append(k)
             else:
                 self.PEOPLE[k].BOX.append(v)
-            print(self.PEOPLE[k].BOX.cal_hw_ratio())
+            print(self.PEOPLE[k].BOX.cal_size_ratio())
 
     def update_untracked(self):
         self.untracked_id = [x for x in self.stored_id if x not in self.curr_id]
@@ -31,3 +33,12 @@ class HumanProcessor:
     def update(self, id2box):
         self.update_box(id2box)
         self.update_untracked()
+        # self.vis_box_size()
+
+    def vis_box_size(self, fr):
+        img_black = cv2.imread("src/black.jpg")
+        for num, idx in enumerate(self.curr_id):
+            self.PEOPLE[idx].BOX.vis_box_size(img_black, idx, num)
+
+        # cv2.imshow("box size", img_black)
+        return cv2.resize(img_black, frame_size)

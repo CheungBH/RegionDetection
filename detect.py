@@ -28,7 +28,7 @@ class RegionDetector(object):
 
     def process(self):
         cnt = 0
-        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        # fourcc = cv2.VideoWriter_fourcc(*'XVID')
         while True:
             ret, frame = self.cap.read()
             if ret:

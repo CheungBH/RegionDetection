@@ -73,9 +73,11 @@ class ImgProcessor:
                 self.id2bbox = self.object_tracker.track(gray_res)
                 boxes = self.object_tracker.id_and_box(self.id2bbox)
                 self.IDV.plot_bbox_id(self.id2bbox, frame)
-                self.HP.update_box(self.id2bbox)
+                self.HP.update(self.id2bbox)
             else:
                 boxes = None
+
             res = self.RP.process_box(boxes, frame)
+            box_res = self.HP.vis_box_size()
 
         return gray_results, black_results, dip_results, res

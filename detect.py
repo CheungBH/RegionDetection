@@ -46,9 +46,9 @@ class RegionDetector(object):
                 # dip_img = cv2.resize(dip_res[0], frame_size)
                 # cv2.imshow("dip_result", dip_img)
                 enhanced = cv2.resize(black_res[0], frame_size)
-                cv2.imshow("black_result", enhanced)
+                # cv2.imshow("black_result", enhanced)
                 gray_img = cv2.resize(gray_res[0], frame_size)
-                cv2.imshow("gray_result", gray_img)
+                # cv2.imshow("gray_result", g1ray_img)
 
                 res = np.concatenate((enhanced, gray_img), axis=1)
                 cv2.imshow("res", res)
@@ -71,20 +71,20 @@ if __name__ == '__main__':
     #     for name in os.listdir(config.video_path+'/'+path):
     #         aa = config.video_path+'/'+path+'/'+name
     #         print(aa)
-    # RD = RegionDetector(config.video_path)
-    # RD.process()
+    RD = RegionDetector(config.video_path)
+    RD.process()
 
-    import shutil
-    src = "video/619_Big Group"
-    for folder in os.listdir(src):
-        video_folder = os.path.join(src, folder)
-        dest_folder = video_folder + "_processed"
-        os.makedirs(dest_folder, exist_ok=True)
-
-        for v_name in os.listdir(video_folder):
-            video = os.path.join(video_folder, v_name)
-            RD = RegionDetector(video)
-            RD.process()
-
-            shutil.copy("output2.mp4", os.path.join(dest_folder, "rd_" + v_name))
-            shutil.copy("output.mp4", os.path.join(dest_folder, "yolo_" + v_name))
+    # import shutil
+    # src = "video/619_Big Group"
+    # for folder in os.listdir(src):
+    #     video_folder = os.path.join(src, folder)
+    #     dest_folder = video_folder + "_processed"
+    #     os.makedirs(dest_folder, exist_ok=True)
+    #
+    #     for v_name in os.listdir(video_folder):
+    #         video = os.path.join(video_folder, v_name)
+    #         RD = RegionDetector(video)
+    #         RD.process()
+    #
+    #         shutil.copy("output2.mp4", os.path.join(dest_folder, "rd_" + v_name))
+    #         shutil.copy("output.mp4", os.path.join(dest_folder, "yolo_" + v_name))

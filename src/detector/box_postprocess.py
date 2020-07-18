@@ -61,3 +61,10 @@ def crop_from_dets(img, boxes):
 def merge_box(gray_box, black_box, gray_scores, black_scores):
     return gray_box, gray_scores
 
+
+def filter_box(boxes, scores, thresh=0.3):
+    keep_ls = []
+    for idx, s in enumerate(scores):
+        if s > thresh:
+            keep_ls.append(idx)
+    return boxes[keep_ls], scores[keep_ls]

@@ -90,16 +90,13 @@ class RegionProcessor:
             if region.if_warning():
                 self.alarm_ls.append(idx)
         if self.alarm_ls:
-            # self.draw_alarm_signal(img)
+            self.draw_alarm_signal(img)
             self.draw_warning_mask(img)
 
     def process_box(self, boxes, fr):
         self.clear()
         self.img = copy.deepcopy(fr)
         if boxes is not None:
-            # occupy_ls = self.occupy_region(boxes)
-            # cover_ls = self.cover_region(boxes)
-            # center_ls = self.center_region(boxes)
             center_ls, cover_ls, occupy_ls = self.region_classify(boxes)
             self.region_process(occupy_ls, cover_ls, center_ls)
         else:

@@ -2,7 +2,6 @@ from .people import Person
 import cv2
 from config.config import frame_size
 import numpy as np
-from src.utils.utils import paste_box
 
 
 class HumanProcessor:
@@ -46,11 +45,6 @@ class HumanProcessor:
     def box_size_warning(self, warning_ls):
         self.RD_warning = warning_ls
         self.RD_box_warning = [idx for idx in warning_ls if not self.PEOPLE[idx].BOX.get_size_ratio_info()]
-        # danger_ls = []
-        # for idx in warning_ls:
-        #     if not self.PEOPLE[idx].BOX.get_size_ratio_info():
-        #         danger_ls.append(idx)
-        # return danger_ls
         return self.RD_box_warning
 
     def vis_box_size(self, im_box):

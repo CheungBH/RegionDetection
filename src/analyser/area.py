@@ -47,6 +47,11 @@ class RegionProcessor:
         br = self.locate(pt_br)
         return [(i, j) for i in range(tl[0], br[0]+1) for j in range(tl[1], br[1]+1)]
 
+    def region_range(self, pt_tl, pt_br):
+        tl = self.locate(pt_tl)
+        br = self.locate(pt_br)
+        return (tl[0], br[0]), (tl[1], br[1])
+
     def region_classify(self, boxes):
         center_region, cover_region, occupy_region = [], [], []
         for box in boxes:
@@ -85,7 +90,7 @@ class RegionProcessor:
             if region.if_warning():
                 self.alarm_ls.append(idx)
         if self.alarm_ls:
-            self.draw_alarm_signal(img)
+            # self.draw_alarm_signal(img)
             self.draw_warning_mask(img)
 
     def process_box(self, boxes, fr):
@@ -112,17 +117,15 @@ class RegionProcessor:
         warning_ls = []
         if self.alarm_ls:
             for idx, box in id2bbox.items():
+                tl, br = (box[0], box[1]), (box[2], box[3])
+                w_range, h_range = self.region_range(tl, br)
                 for center in self.alarm_ls:
-                    if self.REGIONS[center].center[0] <= box[2].item() and \
-                            self.REGIONS[center].center[0] >= box[0].item() \
-                        and self.REGIONS[center].center[1] <= box[3].item() \
-                            and self.REGIONS[center].center[1] >= box[1].item():
+                    if w_range[1] >= center[0] >= w_range[0] and h_range[1] >= center[1] >= h_range[0]:
                         warning_ls.append(idx)
         return warning_ls
 
-
     def draw_alarm_signal(self, img):
-        cv2.putText(img, "HELP!!!", (360, 270), cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 3)
+        cv2.putText(img, "Somewhere abnormal!", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 255), 2)
 
     def draw_cnt_map(self, img):
         for idx, region in self.REGIONS.items():
@@ -132,7 +135,7 @@ class RegionProcessor:
         print(self.alarm_ls)
         for idx in self.alarm_ls:
             region = self.REGIONS[idx]
-            img = cv2.rectangle(img, (region.left, region.top), (region.right, region.bottom), (0, 0, 255), -1)
+            img = cv2.rectangle(img, (region.left, region.top), (region.right, region.bottom), (0, 255, 255), -1)
 
     def visualize(self, boxes, img):
         im_black = cv2.imread("src/black.jpg")

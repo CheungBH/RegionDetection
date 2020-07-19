@@ -53,6 +53,6 @@ class Box:
         return (int(x1), int(y1)), (int(x2), int(y2))
 
     def vis_size(self, img, idx, num):
-        cv2.putText(img, "id{}".format(idx), (20 + 120*num, 40), cv2.FONT_ITALIC, 0.8, (0, 255, 255), 3)
+        cv2.putText(img, "id{}".format(idx), (20 + 140*num, 40), cv2.FONT_ITALIC, 0.8, (0, 255, 255), 3)
         for i, item in enumerate(self.ratios.tolist()[::-1]):
-            cv2.putText(img, "f{}: {}".format(i, round(item, 2)), (20 + 120*num, + 100+ 40*i), cv2.FONT_HERSHEY_SIMPLEX, 0.8, self.text_color(item), 2)
+            cv2.putText(img, "f{}: {}".format(i, round(item, 2)), (20 + 140*num, + 100+ 40*i), cv2.FONT_HERSHEY_SIMPLEX, 0.8, self.text_color(item), 2)

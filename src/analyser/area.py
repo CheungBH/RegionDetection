@@ -122,7 +122,7 @@ class RegionProcessor:
         return warning_ls
 
     def draw_alarm_signal(self, img):
-        cv2.putText(img, "Somewhere abnormal!", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 255), 2)
+        cv2.putText(img, "Somewhere abnormal!", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 255), 2)
 
     def draw_cnt_map(self, img):
         for idx, region in self.REGIONS.items():

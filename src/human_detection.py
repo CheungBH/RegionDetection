@@ -89,6 +89,9 @@ class ImgProcessor:
             danger_idx = self.HP.box_size_warning(warning_idx)
             print(warning_idx)
             print(danger_idx)
+
+            # danger_box = [v for k, v in self.id2bbox.items() if k in danger_idx]
+
             box_map = self.HP.vis_box_size(img_black)
             yolo_map = np.concatenate((enhanced, gray_img), axis=1)
             yolo_cnt_map = np.concatenate((yolo_map, rd_map), axis=0)

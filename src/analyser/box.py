@@ -30,6 +30,8 @@ class Box:
         tmp = self.boxes[-cal_hw_num:] if len(self) > cal_hw_num else self.boxes
         self.ratios = (tmp[:,3]-tmp[:,1])/(tmp[:,2]-tmp[:,0])
         # print(self.ratios)
+
+    def get_size_ratio_info(self):
         return True if sum((self.ratios > box_ratio_thresh).float())/len(self.ratios) >= hw_percent_ratio else False
 
     def cal_curr_hw(self):
@@ -41,6 +43,10 @@ class Box:
 
     def curr_center(self):
         return cal_center_point(self.curr_box)
+
+    def curr_top(self):
+        x1, y1, x2, y2 = self.curr_box
+        return int((x1 + x2) / 2), int(y1)-20
 
     def vis_size(self, img, idx, num):
         cv2.putText(img, "id{}".format(idx), (30 + 160*num, 40), cv2.FONT_ITALIC, 0.8, (0, 255, 255), 2)

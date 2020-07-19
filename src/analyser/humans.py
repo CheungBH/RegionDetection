@@ -11,10 +11,16 @@ class HumanProcessor:
         self.PEOPLE = {}
         self.curr_id = []
         self.untracked_id = []
+        self.curr_box_res = {}
+        self.RD_warning = []
+        self.RD_box_warning = []
 
     def clear(self):
         self.curr_id = []
         self.untracked_id = []
+        self.curr_box_res = {}
+        self.RD_warning = []
+        self.RD_box_warning = []
 
     def update_box(self, id2box):
         self.clear()
@@ -25,7 +31,7 @@ class HumanProcessor:
                 self.stored_id.append(k)
             else:
                 self.PEOPLE[k].BOX.append(v)
-            self.PEOPLE[k].BOX.cal_size_ratio()
+            self.curr_box_res[k] = self.PEOPLE[k].BOX.cal_size_ratio()
 
     def update_untracked(self):
         self.untracked_id = [x for x in self.stored_id if x not in self.curr_id]
@@ -37,6 +43,16 @@ class HumanProcessor:
         self.update_untracked()
         # self.vis_box_size()
 
+    def box_size_warning(self, warning_ls):
+        self.RD_warning = warning_ls
+        self.RD_box_warning = [idx for idx in warning_ls if not self.PEOPLE[idx].BOX.get_size_ratio_info()]
+        # danger_ls = []
+        # for idx in warning_ls:
+        #     if not self.PEOPLE[idx].BOX.get_size_ratio_info():
+        #         danger_ls.append(idx)
+        # return danger_ls
+        return self.RD_box_warning
+
     def vis_box_size(self, im_box):
         img_cnt = cv2.imread("src/black.jpg")
         img_cnt = cv2.resize(img_cnt, frame_size)
@@ -47,6 +63,15 @@ class HumanProcessor:
             cv2.putText(im_box, "{}".format(round((h/w).tolist(), 4)), self.PEOPLE[idx].BOX.curr_center(),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 255), 2)
 
+            if idx in self.RD_box_warning:
+                cv2.putText(im_box, "id{}: Not standing".format(idx), self.PEOPLE[idx].BOX.curr_top(),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 255), 2)
+            elif idx in self.RD_warning:
+                cv2.putText(im_box, "id{}: Standing".format(idx), self.PEOPLE[idx].BOX.curr_top(),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (100, 255, 255), 2)
+            else:
+                cv2.putText(im_box, "id{}".format(idx), self.PEOPLE[idx].BOX.curr_top(),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
 
         # cv2.imshow("box size", img_black)
         im_box = cv2.resize(im_box, frame_size)

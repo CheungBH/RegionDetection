@@ -57,7 +57,8 @@ class ImgProcessor:
             if black_res is not None:
                 black_boxes, black_scores = self.black_yolo.cut_box_score(black_res)
                 enhanced = self.BBV.visualize(black_boxes, enhanced, black_scores)
-                black_boxes, black_scores = filter_box(black_boxes, black_scores, config.black_box_threshold)
+                black_boxes, black_scores, black_res = \
+                    filter_box(black_boxes, black_scores, black_res, config.black_box_threshold)
             black_results = [enhanced, black_boxes, black_scores]
 
             # gray pics process
@@ -66,9 +67,11 @@ class ImgProcessor:
             if gray_res is not None:
                 gray_boxes, gray_scores = self.gray_yolo.cut_box_score(gray_res)
                 gray_img = self.BBV.visualize(gray_boxes, gray_img, gray_scores)
-                gray_boxes, gray_scores = filter_box(gray_boxes, gray_scores, config.gray_box_threshold)
+                gray_boxes, gray_scores, gray_res = \
+                    filter_box(gray_boxes, gray_scores, gray_res, config.gray_box_threshold)
 
             gray_results = [gray_img, gray_boxes, gray_scores]
+
             img_black = cv2.imread("src/black.jpg")
             img_black = cv2.resize(img_black, config.frame_size)
 
@@ -76,14 +79,16 @@ class ImgProcessor:
                 self.id2bbox = self.object_tracker.track(gray_res)
                 boxes = self.object_tracker.id_and_box(self.id2bbox)
                 self.IDV.plot_bbox_id(self.id2bbox, frame)
-                self.IDV.plot_bbox_id(self.id2bbox, img_black)
-                self.BBV.visualize(boxes, img_black)
                 img_black = paste_box(frame_tmp, img_black, boxes)
                 self.HP.update(self.id2bbox)
             else:
                 boxes = None
 
             rd_map = self.RP.process_box(boxes, frame)
+            warning_idx = self.RP.get_alarmed_box_id(self.id2bbox)
+            danger_idx = self.HP.box_size_warning(warning_idx)
+            print(warning_idx)
+            print(danger_idx)
             box_map = self.HP.vis_box_size(img_black)
             yolo_map = np.concatenate((enhanced, gray_img), axis=1)
             yolo_cnt_map = np.concatenate((yolo_map, rd_map), axis=0)

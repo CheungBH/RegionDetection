@@ -108,6 +108,19 @@ class RegionProcessor:
             self.out.write(res)
         return res
 
+    def get_alarmed_box_id(self, id2bbox):
+        warning_ls = []
+        if self.alarm_ls:
+            for idx, box in id2bbox.items():
+                for center in self.alarm_ls:
+                    if self.REGIONS[center].center[0] <= box[2].item() and \
+                            self.REGIONS[center].center[0] >= box[0].item() \
+                        and self.REGIONS[center].center[1] <= box[3].item() \
+                            and self.REGIONS[center].center[1] >= box[1].item():
+                        warning_ls.append(idx)
+        return warning_ls
+
+
     def draw_alarm_signal(self, img):
         cv2.putText(img, "HELP!!!", (360, 270), cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 3)
 

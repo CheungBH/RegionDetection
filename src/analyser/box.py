@@ -46,7 +46,11 @@ class Box:
 
     def curr_top(self):
         x1, y1, x2, y2 = self.curr_box
-        return int((x1 + x2) / 2), int(y1)-20
+        return int(x1), int(y1)-20
+
+    def curr_box_location(self):
+        x1, y1, x2, y2 = self.curr_box
+        return (int(x1), int(y1)), (int(x2), int(y2))
 
     def vis_size(self, img, idx, num):
         cv2.putText(img, "id{}".format(idx), (30 + 160*num, 40), cv2.FONT_ITALIC, 0.8, (0, 255, 255), 2)

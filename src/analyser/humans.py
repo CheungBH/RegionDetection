@@ -61,17 +61,17 @@ class HumanProcessor:
             self.PEOPLE[idx].BOX.vis_size(img_cnt, idx, num)
             h, w = self.PEOPLE[idx].BOX.cal_curr_hw()
             cv2.putText(im_box, "{}".format(round((h/w).tolist(), 4)), self.PEOPLE[idx].BOX.curr_center(),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 255), 2)
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 0), 2)
 
             tl, br = self.PEOPLE[idx].BOX.curr_box_location()
             if idx in self.RD_box_warning:
                 cv2.putText(im_box, "id{}: Not standing".format(idx), self.PEOPLE[idx].BOX.curr_top(),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.8, (100, 255, 255), 2)
-                cv2.rectangle(im_box, tl, br, (100, 255, 255), 4)
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 255), 2)
+                cv2.rectangle(im_box, tl, br, (255, 0, 255), 4)
             elif idx in self.RD_warning:
                 cv2.putText(im_box, "id{}: Standing".format(idx), self.PEOPLE[idx].BOX.curr_top(),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
-                cv2.rectangle(im_box, tl, br, (0, 255, 0), 4)
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (100, 255, 255), 2)
+                cv2.rectangle(im_box, tl, br, (100, 255, 255), 4)
             else:
                 cv2.putText(im_box, "id{}".format(idx), self.PEOPLE[idx].BOX.curr_top(),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)

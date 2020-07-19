@@ -3,7 +3,7 @@ from src.utils.utils import cal_center_point
 import cv2
 
 max_box_store = 50
-box_ratio_thresh = 3
+box_ratio_thresh = 2.8
 cal_hw_num = 10
 hw_percent_ratio = 0.8
 
@@ -39,7 +39,7 @@ class Box:
         return h, w
 
     def text_color(self, r):
-        return (0, 255, 255) if r > box_ratio_thresh else (255, 255, 0)
+        return (100, 255, 255) if r > box_ratio_thresh else (255, 0, 255)
 
     def curr_center(self):
         return cal_center_point(self.curr_box)
@@ -53,6 +53,6 @@ class Box:
         return (int(x1), int(y1)), (int(x2), int(y2))
 
     def vis_size(self, img, idx, num):
-        cv2.putText(img, "id{}".format(idx), (30 + 160*num, 40), cv2.FONT_ITALIC, 0.8, (0, 255, 255), 2)
+        cv2.putText(img, "id{}".format(idx), (20 + 120*num, 40), cv2.FONT_ITALIC, 0.8, (0, 255, 255), 3)
         for i, item in enumerate(self.ratios.tolist()[::-1]):
-            cv2.putText(img, "f-{}: {}".format(i, round(item, 2)), (30 + 160*num, + 100+ 40*i), cv2.FONT_HERSHEY_SIMPLEX, 0.8, self.text_color(item), 1)
+            cv2.putText(img, "f{}: {}".format(i, round(item, 2)), (20 + 120*num, + 100+ 40*i), cv2.FONT_HERSHEY_SIMPLEX, 0.8, self.text_color(item), 2)

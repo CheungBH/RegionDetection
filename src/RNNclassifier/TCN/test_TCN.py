@@ -37,9 +37,9 @@ class TCNPredictor:
         input = self.get_input_data(data)
         output = self.model(input)
         #print('output:',output)
-        pred = output.data.max(1, keepdim=True)[1]
+        # pred = output.data.max(1, keepdim=True)[1]
         #print('pred:',pred)
-        return pred
+        return output
 
 
 class TestWithtxt:

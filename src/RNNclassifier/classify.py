@@ -31,10 +31,15 @@ class RNNInference:
         if "TCN" == RNN_backbone:
             return TCNPredictor(model, len(RNN_class))
 
-    def predict(self, inp):
+    def predict_pos(self, inp):
         pred = self.tester.predict(np.array(inp).astype(np.float32))
         return pred
 
+    def predict_class(self, inp):
+        output = self.predict_pos(inp)
+        pred = output.data.max(1, keepdim=True)[1]
+        return pred
+
     def predict_action(self, inp):
-        pred = self.tester.predict(np.array(inp).astype(np.float32))
+        pred = self.predict_class(inp)
         return RNN_class[pred]

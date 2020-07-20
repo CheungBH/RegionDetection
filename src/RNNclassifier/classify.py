@@ -48,10 +48,10 @@ class RNNInference:
     def vis_RNN_res(self, n, idx, preds, img):
         cv2.putText(img, "id{}".format(idx), (20 + 140*n, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (100, 100, 255), 2)
         for i, pred in enumerate(preds):
-            cv2.putText(img, "f{}: {}".format(i, pred), (20 + 140 * n, 40 + 40*i), cv2.FONT_HERSHEY_SIMPLEX, 0.8, self.vis_color(pred), 2)
+            cv2.putText(img, "f{}: {}".format(i, pred), (20 + 140 * n, 80 + 40*i), cv2.FONT_HERSHEY_SIMPLEX, 0.8, self.vis_color(pred), 2)
 
     def vis_color(self, pred):
         if "drown" in pred:
             return 0, 0, 255
-        return 100, 100, 255
+        return 192, 192, 192
 

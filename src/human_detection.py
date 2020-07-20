@@ -98,6 +98,7 @@ class ImgProcessor:
             rd_map = self.RP.process_box(boxes, frame)
             warning_idx = self.RP.get_alarmed_box_id(self.id2bbox)
             danger_idx = self.HP.box_size_warning(warning_idx)
+            box_map = self.HP.vis_box_size(img_black)
 
             if danger_idx:
                 danger_box = [v.numpy() for k, v in self.id2bbox.items() if k in danger_idx]
@@ -122,7 +123,6 @@ class ImgProcessor:
                                 # print("Prediction of idx {}： {}".format(idx, RNN_res))
 
             cv2.putText(tmp, "TBC...", (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 3)
-            box_map = self.HP.vis_box_size(img_black)
             detection_map = np.concatenate((enhanced, gray_img), axis=1)
             yolo_cnt_map = np.concatenate((detection_map, rd_map), axis=0)
             yolo_map = np.concatenate((yolo_cnt_map, box_map), axis=1)

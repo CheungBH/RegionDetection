@@ -122,7 +122,8 @@ class ImgProcessor:
                                 self.RNN_model.vis_RNN_res(n, idx, self.HP.get_RNN_preds(idx), black_kps)
                                 # print("Prediction of idx {}： {}".format(idx, RNN_res))
 
-            cv2.putText(tmp, "TBC...", (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 3)
+            cv2.putText(tmp, "Advertising space", (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 2)
+            cv2.putText(tmp, "for rent..", (200, 200), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 2)
             detection_map = np.concatenate((enhanced, gray_img), axis=1)
             yolo_cnt_map = np.concatenate((detection_map, rd_map), axis=0)
             yolo_map = np.concatenate((yolo_cnt_map, box_map), axis=1)

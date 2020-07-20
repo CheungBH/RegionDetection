@@ -12,10 +12,10 @@ class AreaVisualizer:
     def draw_boundary(self, img):
         for i in range(self.width_num - 1):
             cv2.line(img, (0, (i + 1) * self.h_interval),
-                     (self.width, (i + 1) * self.h_interval), [0, 255, 255], 1)
+                     (self.width, (i + 1) * self.h_interval), (0, 255, 255), 1)
         for j in range(self.height_num - 1):
             cv2.line(img, ((j + 1) * self.w_interval, 0),
-                     ((j + 1) * self.w_interval, self.height), [0, 255, 255], 1)
+                     ((j + 1) * self.w_interval, self.height), (0, 255, 255), 1)
 
     def draw_box(self, boxes, img):
         for box in boxes:
@@ -28,7 +28,7 @@ class AreaVisualizer:
 
     def draw_cnt_map(self, img, REGIONS):
         for idx, region in REGIONS.items():
-            cv2.putText(img, str(region.exists), region.center, cv2.FONT_HERSHEY_SIMPLEX, 0.8, region.cnt_color(), 1)
+            cv2.putText(img, str(region.exists), region.center, cv2.FONT_HERSHEY_SIMPLEX, 0.8, region.cnt_color(), 2)
 
     def draw_warning_mask(self, img, REGIONS, alarm_ls):
         # print(alarm_ls)

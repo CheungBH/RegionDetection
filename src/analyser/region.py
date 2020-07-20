@@ -52,5 +52,5 @@ class Region:
 
     def cnt_color(self):
         if self.exists > alarm_cnt:
-            return 0, 0, 255
+            return 100, 100, 255
         return 87, 250, 255

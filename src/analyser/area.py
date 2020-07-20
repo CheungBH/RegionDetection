@@ -129,7 +129,7 @@ class RegionProcessor:
             cv2.putText(img, str(region.exists), region.center, cv2.FONT_HERSHEY_SIMPLEX, 0.8, region.cnt_color(), 1)
 
     def draw_warning_mask(self, img):
-        print(self.alarm_ls)
+        # print(self.alarm_ls)
         for idx in self.alarm_ls:
             region = self.REGIONS[idx]
             img = cv2.rectangle(img, (region.left, region.top), (region.right, region.bottom), (0, 255, 255), -1)

@@ -81,7 +81,7 @@ class HumanProcessor:
         return np.concatenate((img_cnt, im_box), axis=0)
 
     def update_kps(self, id2ske):
-        for k, v in id2ske:
+        for k, v in id2ske.items():
             coord = self.KPSP.process_kp(v)
             self.PEOPLE[k].KPS.append(coord)
             self.KPS_idx.append(k)

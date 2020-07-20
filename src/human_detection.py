@@ -16,6 +16,7 @@ from src.tracker.visualize import IDVisualizer
 from src.analyser.area import RegionProcessor
 from src.analyser.humans import HumanProcessor
 from src.utils.utils import paste_box
+from src.RNNclassifier.classify import RNNInference
 
 try:
     from config.config import gray_yolo_cfg, gray_yolo_weights, black_yolo_cfg, black_yolo_weights, video_path
@@ -29,9 +30,9 @@ class ImgProcessor:
     def __init__(self, show_img=True):
         self.black_yolo = ObjectDetectionYolo(cfg=black_yolo_cfg, weight=black_yolo_weights)
         self.gray_yolo = ObjectDetectionYolo(cfg=gray_yolo_cfg, weight=gray_yolo_weights)
-        self.BBV = BBoxVisualizer()
         self.object_tracker = ObjectTracker()
         self.dip_detection = ImageProcessDetection()
+        self.RNN_model = RNNInference()
         self.pose_estimator = PoseEstimator(pose_cfg=config.pose_cfg, pose_weight=config.pose_weight)
         self.KPV = KeyPointVisualizer()
         self.BBV = BBoxVisualizer()
@@ -93,8 +94,8 @@ class ImgProcessor:
             rd_map = self.RP.process_box(boxes, frame)
             warning_idx = self.RP.get_alarmed_box_id(self.id2bbox)
             danger_idx = self.HP.box_size_warning(warning_idx)
-            print(warning_idx)
-            print(danger_idx)
+            # print(warning_idx)
+            # print(danger_idx)
 
             if danger_idx:
                 danger_box = [v.numpy() for k, v in self.id2bbox.items() if k in danger_idx]
@@ -102,9 +103,16 @@ class ImgProcessor:
                 inps, pt1, pt2 = crop_bbox(frame, danger_box)
                 if inps is not None:
                     kps, kps_score, kps_id = self.pose_estimator.process_img(inps, danger_box, pt1, pt2)
-                    # self.kps, self.kps_score = self.object_tracker.match_kps(kps_id, kps, kps_score)
                     if self.kps is not []:
+                        self.kps, self.kps_score = self.object_tracker.match_kps(kps_id, kps, kps_score)
                         frame_tmp = self.KPV.vis_ske(frame_tmp, kps, kps_score)
+                        self.HP.update_kps(self.kps)
+
+                        for idx in self.kps.keys():
+                            if self.HP.if_enough_kps(idx):
+                                RNN_res = self.RNN_model.predict_action(self.HP.obtain_kps(idx))
+                                print("Prediction of idx {}： {}".format(idx, RNN_res))
+
             cv2.imshow("kps", frame_tmp)
 
             box_map = self.HP.vis_box_size(img_black)

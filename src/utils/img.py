@@ -12,7 +12,7 @@ import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 
-# from config.config import pose_cls
+from config.config import pose_cls
 
 
 def im_to_torch(img):
@@ -227,32 +227,32 @@ def transformBoxInvert(pt, ul, br, inpH, inpW, resH, resW):
     new_point[0] = _pt[0] + ul[0]
     new_point[1] = _pt[1] + ul[1]
     return new_point
-#
-#
-# def transformBoxInvert_batch(pt, ul, br, inpH, inpW, resH, resW):
-#     '''
-#     pt:     [n, 17, 2]
-#     ul:     [n, 2]
-#     br:     [n, 2]
-#     '''
-#     center = (br - 1 - ul) / 2
-#
-#     size = br - ul
-#     size[:, 0] *= (inpH / inpW)
-#
-#     lenH, _ = torch.max(size, dim=1)   # [n,]
-#     lenW = lenH * (inpW / inpH)
-#
-#     _pt = (pt * lenH[:, np.newaxis, np.newaxis]) / resH
-#     _pt[:, :, 0] = _pt[:, :, 0] - ((lenW[:, np.newaxis].repeat(1, pose_cls) - 1) /
-#                                    2 - center[:, 0].unsqueeze(-1).repeat(1, pose_cls)).clamp(min=0)
-#     _pt[:, :, 1] = _pt[:, :, 1] - ((lenH[:, np.newaxis].repeat(1, pose_cls) - 1) /
-#                                    2 - center[:, 1].unsqueeze(-1).repeat(1, pose_cls)).clamp(min=0)
-#
-#     new_point = torch.zeros(pt.size())
-#     new_point[:, :, 0] = _pt[:, :, 0] + ul[:, 0].unsqueeze(-1).repeat(1, pose_cls)
-#     new_point[:, :, 1] = _pt[:, :, 1] + ul[:, 1].unsqueeze(-1).repeat(1, pose_cls)
-#     return new_point
+
+
+def transformBoxInvert_batch(pt, ul, br, inpH, inpW, resH, resW):
+    '''
+    pt:     [n, 17, 2]
+    ul:     [n, 2]
+    br:     [n, 2]
+    '''
+    center = (br - 1 - ul) / 2
+
+    size = br - ul
+    size[:, 0] *= (inpH / inpW)
+
+    lenH, _ = torch.max(size, dim=1)   # [n,]
+    lenW = lenH * (inpW / inpH)
+
+    _pt = (pt * lenH[:, np.newaxis, np.newaxis]) / resH
+    _pt[:, :, 0] = _pt[:, :, 0] - ((lenW[:, np.newaxis].repeat(1, pose_cls) - 1) /
+                                   2 - center[:, 0].unsqueeze(-1).repeat(1, pose_cls)).clamp(min=0)
+    _pt[:, :, 1] = _pt[:, :, 1] - ((lenH[:, np.newaxis].repeat(1, pose_cls) - 1) /
+                                   2 - center[:, 1].unsqueeze(-1).repeat(1, pose_cls)).clamp(min=0)
+
+    new_point = torch.zeros(pt.size())
+    new_point[:, :, 0] = _pt[:, :, 0] + ul[:, 0].unsqueeze(-1).repeat(1, pose_cls)
+    new_point[:, :, 1] = _pt[:, :, 1] + ul[:, 1].unsqueeze(-1).repeat(1, pose_cls)
+    return new_point
 
 
 def cropBox(img, ul, br, resH, resW):

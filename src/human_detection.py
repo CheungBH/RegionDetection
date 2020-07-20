@@ -7,6 +7,8 @@ from src.detector.yolo_detect import ObjectDetectionYolo
 from src.detector.image_process_detect import ImageProcessDetection
 # from src.detector.yolo_asff_detector import ObjectDetectionASFF
 from src.detector.visualize import BBoxVisualizer
+from src.estimator.pose_estimator import PoseEstimator
+from src.estimator.visualize import KeyPointVisualizer
 from src.utils.img import gray3D
 from src.detector.box_postprocess import crop_bbox, merge_box, filter_box
 from src.tracker.track import ObjectTracker
@@ -30,6 +32,8 @@ class ImgProcessor:
         self.BBV = BBoxVisualizer()
         self.object_tracker = ObjectTracker()
         self.dip_detection = ImageProcessDetection()
+        self.pose_estimator = PoseEstimator(pose_cfg=config.pose_cfg, pose_weight=config.pose_weight)
+        self.KPV = KeyPointVisualizer()
         self.BBV = BBoxVisualizer()
         self.IDV = IDVisualizer(with_bbox=False)
         self.img = []
@@ -37,7 +41,9 @@ class ImgProcessor:
         self.img_black = []
         self.show_img = show_img
         self.RP = RegionProcessor(config.frame_size[0], config.frame_size[1], 10, 10)
-        self.HP = HumanProcessor()
+        self.HP = HumanProcessor(config.frame_size[0], config.frame_size[1])
+        self.kps = {}
+        self.kps_score = {}
 
     def process_img(self, frame, background):
         black_boxes, black_scores, gray_boxes, gray_scores = None, None, None, None
@@ -90,7 +96,16 @@ class ImgProcessor:
             print(warning_idx)
             print(danger_idx)
 
-            # danger_box = [v for k, v in self.id2bbox.items() if k in danger_idx]
+            if danger_idx:
+                danger_box = [v.numpy() for k, v in self.id2bbox.items() if k in danger_idx]
+                danger_box = torch.FloatTensor(danger_box)
+                inps, pt1, pt2 = crop_bbox(frame, danger_box)
+                if inps is not None:
+                    kps, kps_score, kps_id = self.pose_estimator.process_img(inps, danger_box, pt1, pt2)
+                    # self.kps, self.kps_score = self.object_tracker.match_kps(kps_id, kps, kps_score)
+                    if self.kps is not []:
+                        frame_tmp = self.KPV.vis_ske(frame_tmp, kps, kps_score)
+            cv2.imshow("kps", frame_tmp)
 
             box_map = self.HP.vis_box_size(img_black)
             yolo_map = np.concatenate((enhanced, gray_img), axis=1)

@@ -11,8 +11,14 @@ class Person:
         self.BOX = Box(box)
         self.KPS = Keypoint()
         self.disappear = 0
-        self.img = []
-        self.RNN_pred = []
+        self.RNN_preds = []
+        self.CNN_preds = []
+
+    def clear(self):
+        self.KPS = Keypoint()
+        self.disappear = 0
+        self.RNN_preds = []
+        self.CNN_preds = []
 
     def box_len(self):
         return len(self.BOX)
@@ -28,7 +34,11 @@ class Person:
                 self.disappear += 1
 
     def update_RNN_pred(self, pred):
-        self.RNN_pred.append(pred)
-        if len(self.RNN_pred) >= max_model_pred:
-            self.RNN_pred = self.RNN_pred[-max_model_pred:]
+        self.RNN_preds.append(pred)
+        if len(self.RNN_preds) >= max_model_pred:
+            self.RNN_preds = self.RNN_preds[-max_model_pred:]
 
+    def update_CNN_pred(self, pred):
+        self.CNN_preds.append(pred)
+        if len(self.CNN_preds) >= max_model_pred:
+            self.CNN_preds = self.CNN_preds[-max_model_pred:]

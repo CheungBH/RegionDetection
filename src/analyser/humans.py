@@ -96,4 +96,4 @@ class HumanProcessor:
         self.PEOPLE[idx].update_RNN_pred(pred)
 
     def get_RNN_preds(self, idx):
-        return self.PEOPLE[idx].RNN_pred
+        return self.PEOPLE[idx].RNN_preds

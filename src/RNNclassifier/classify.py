@@ -8,6 +8,7 @@ from .TCN.test_TCN import TCNPredictor
 # except:
 #     lstm = False
 
+import cv2
 import numpy as np
 from config.config import RNN_backbone, RNN_class, RNN_weight
 
@@ -43,3 +44,14 @@ class RNNInference:
     def predict_action(self, inp):
         pred = self.predict_class(inp)
         return RNN_class[pred]
+
+    def vis_RNN_res(self, n, idx, preds, img):
+        cv2.putText(img, "id{}".format(idx), (20 + 140*n, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+        for i, pred in enumerate(preds):
+            cv2.putText(img, "f{}: {}".format(i, pred), (20 + 140 * n, 100 + 20*i), cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.vis_color(pred), 2)
+
+    def vis_color(self, pred):
+        if "drown" in pred:
+            return 0, 0, 255
+        return 100, 100, 255
+

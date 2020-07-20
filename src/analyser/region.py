@@ -2,7 +2,7 @@
 
 disappear_max = 20
 exist_max = 150
-alarm_cnt = 10
+alarm_cnt = 100
 
 
 class Region:

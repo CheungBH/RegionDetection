@@ -48,7 +48,7 @@ class ImgProcessor:
 
     def process_img(self, frame, background):
         black_boxes, black_scores, gray_boxes, gray_scores = None, None, None, None
-        frame_tmp = copy.deepcopy(frame)
+        # rgb_kps = copy.deepcopy(frame)
         diff = cv2.absdiff(frame, background)
         dip_img = copy.deepcopy(frame)
         dip_boxes = self.dip_detection.detect_rect(diff)
@@ -81,45 +81,52 @@ class ImgProcessor:
 
             img_black = cv2.imread("src/black.jpg")
             img_black = cv2.resize(img_black, config.frame_size)
+            tmp = copy.deepcopy(img_black)
+            black_kps = copy.deepcopy(img_black)
 
             if gray_res is not None:
                 self.id2bbox = self.object_tracker.track(gray_res)
                 boxes = self.object_tracker.id_and_box(self.id2bbox)
-                self.IDV.plot_bbox_id(self.id2bbox, frame)
-                img_black = paste_box(frame_tmp, img_black, boxes)
-                self.HP.update(self.id2bbox)
+                frame = self.IDV.plot_bbox_id(self.id2bbox, frame)
             else:
                 boxes = None
+
+            rgb_kps = copy.deepcopy(frame)
+            img_black = paste_box(rgb_kps, img_black, boxes)
+            self.HP.update(self.id2bbox)
 
             rd_map = self.RP.process_box(boxes, frame)
             warning_idx = self.RP.get_alarmed_box_id(self.id2bbox)
             danger_idx = self.HP.box_size_warning(warning_idx)
-            # print(warning_idx)
-            # print(danger_idx)
 
             if danger_idx:
                 danger_box = [v.numpy() for k, v in self.id2bbox.items() if k in danger_idx]
                 danger_box = torch.FloatTensor(danger_box)
-                inps, pt1, pt2 = crop_bbox(frame, danger_box)
+                inps, pt1, pt2 = crop_bbox(rgb_kps, danger_box)
                 if inps is not None:
                     kps, kps_score, kps_id = self.pose_estimator.process_img(inps, danger_box, pt1, pt2)
                     if self.kps is not []:
                         self.kps, self.kps_score = self.object_tracker.match_kps(kps_id, kps, kps_score)
-                        frame_tmp = self.KPV.vis_ske(frame_tmp, kps, kps_score)
                         self.HP.update_kps(self.kps)
+                        rgb_kps = self.KPV.vis_ske(rgb_kps, kps, kps_score)
+                        rgb_kps = self.IDV.plot_skeleton_id(self.kps, rgb_kps)
+                        rgb_kps = self.BBV.visualize(danger_box, rgb_kps)
+                        black_kps = self.KPV.vis_ske_black(black_kps, kps, kps_score)
+                        black_kps = self.IDV.plot_skeleton_id(self.kps, black_kps)
 
-                        for idx in self.kps.keys():
+                        for n, idx in enumerate(self.kps.keys()):
                             if self.HP.if_enough_kps(idx):
                                 RNN_res = self.RNN_model.predict_action(self.HP.obtain_kps(idx))
-                                print("Prediction of idx {}： {}".format(idx, RNN_res))
+                                self.HP.update_RNN(idx, RNN_res)
+                                self.RNN_model.vis_RNN_res(n, idx, self.HP.get_RNN_preds(idx), black_kps)
+                                # print("Prediction of idx {}： {}".format(idx, RNN_res))
 
-            cv2.imshow("kps", frame_tmp)
-
+            cv2.putText(tmp, "TBC...", (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 3)
             box_map = self.HP.vis_box_size(img_black)
-            yolo_map = np.concatenate((enhanced, gray_img), axis=1)
-            yolo_cnt_map = np.concatenate((yolo_map, rd_map), axis=0)
-            res = np.concatenate((yolo_cnt_map, box_map), axis=1)
-
-            # cv2.imshow("black_box", img_black)
+            detection_map = np.concatenate((enhanced, gray_img), axis=1)
+            yolo_cnt_map = np.concatenate((detection_map, rd_map), axis=0)
+            yolo_map = np.concatenate((yolo_cnt_map, box_map), axis=1)
+            kps_img = np.concatenate((tmp, rgb_kps, black_kps), axis=1)
+            res = np.concatenate((yolo_map, kps_img), axis=0)
 
         return gray_results, black_results, dip_results, res

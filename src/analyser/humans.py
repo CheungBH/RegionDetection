@@ -1,6 +1,6 @@
 from .people import Person
 import cv2
-from config.config import frame_size, RNN_frame_length
+from config.config import frame_size
 import numpy as np
 from src.utils.kp_process import KPSProcessor
 
@@ -91,3 +91,9 @@ class HumanProcessor:
 
     def if_enough_kps(self, idx):
         return self.PEOPLE[idx].KPS.enough
+
+    def update_RNN(self, idx, pred):
+        self.PEOPLE[idx].update_RNN_pred(pred)
+
+    def get_RNN_preds(self, idx):
+        return self.PEOPLE[idx].RNN_pred

@@ -62,23 +62,23 @@ if __name__ == '__main__':
     # for path in os.listdir(config.video_path):
     #     for name in os.listdir(config.video_path+'/'+path):
     #         aa = config.video_path+'/'+path+'/'+name
-    #         print(aa)
-    RD = RegionDetector(config.video_path)
-    RD.process()
+    # #         print(aa)
+    # RD = RegionDetector(config.video_path)
+    # RD.process()
 
     import shutil
     import os
     # src = "video/619_Big Group"
     # for folder in os.listdir(src):
     # video_folder = os.path.join(src, folder)
-    # video_folder = "D:/0619_BIG"
-    # dest_folder = video_folder + "_res"
-    # os.makedirs(dest_folder, exist_ok=True)
-    #
-    # for v_name in os.listdir(video_folder):
-    #     video = os.path.join(video_folder, v_name)
-    #     RD = RegionDetector(video)
-    #     RD.process()
-    #
-    #     # shutil.copy("output2.mp4", os.path.join(dest_folder, "rd_" + v_name))
-    #     shutil.move("output.mp4", os.path.join(dest_folder, v_name))
+    video_folder = "C:/Users/hkuit164/Downloads/drowning video"
+    dest_folder = video_folder + "_4frames"
+    os.makedirs(dest_folder, exist_ok=True)
+
+    for v_name in os.listdir(video_folder):
+        video = os.path.join(video_folder, v_name)
+        RD = RegionDetector(video)
+        RD.process()
+
+        # shutil.copy("output2.mp4", os.path.join(dest_folder, "rd_" + v_name))
+        shutil.move("output.mp4", os.path.join(dest_folder, v_name))

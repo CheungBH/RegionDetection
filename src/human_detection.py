@@ -63,9 +63,10 @@ class ImgProcessor:
             black_res = self.black_yolo.process(enhanced)
             if black_res is not None:
                 black_boxes, black_scores = self.black_yolo.cut_box_score(black_res)
-                enhanced = self.BBV.visualize(black_boxes, enhanced, black_scores)
                 black_boxes, black_scores, black_res = \
                     filter_box(black_boxes, black_scores, black_res, config.black_box_threshold)
+                enhanced = self.BBV.visualize(black_boxes, enhanced, black_scores)
+
             black_results = [enhanced, black_boxes, black_scores]
 
             # gray pics process
@@ -73,9 +74,10 @@ class ImgProcessor:
             gray_res = self.gray_yolo.process(gray_img)
             if gray_res is not None:
                 gray_boxes, gray_scores = self.gray_yolo.cut_box_score(gray_res)
-                gray_img = self.BBV.visualize(gray_boxes, gray_img, gray_scores)
                 gray_boxes, gray_scores, gray_res = \
                     filter_box(gray_boxes, gray_scores, gray_res, config.gray_box_threshold)
+                gray_img = self.BBV.visualize(gray_boxes, gray_img, gray_scores)
+
 
             gray_results = [gray_img, gray_boxes, gray_scores]
 
@@ -114,6 +116,7 @@ class ImgProcessor:
                         rgb_kps = self.BBV.visualize(danger_box, rgb_kps)
                         black_kps = self.KPV.vis_ske_black(black_kps, kps, kps_score)
                         black_kps = self.IDV.plot_skeleton_id(self.kps, black_kps)
+                        black_kps = self.BBV.visualize(danger_box, black_kps)
 
                         for n, idx in enumerate(self.kps.keys()):
                             if self.HP.if_enough_kps(idx):
@@ -125,9 +128,11 @@ class ImgProcessor:
             cv2.putText(tmp, "TBC...", (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 3)
             # cv2.putText(tmp, "for rent..", (200, 200), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 2)
             detection_map = np.concatenate((enhanced, gray_img), axis=1)
-            yolo_cnt_map = np.concatenate((detection_map, rd_map), axis=0)
-            yolo_map = np.concatenate((yolo_cnt_map, box_map), axis=1)
-            kps_img = np.concatenate((tmp, rgb_kps, black_kps), axis=1)
-            res = np.concatenate((yolo_map, kps_img), axis=0)
+            tmp = np.concatenate((box_map, black_kps), axis=1)
+            res = np.concatenate((detection_map, tmp), axis=0)
+            # yolo_cnt_map = np.concatenate((detection_map, rd_map), axis=0)
+            # yolo_map = np.concatenate((yolo_cnt_map, box_map), axis=1)
+            # kps_img = np.concatenate((tmp, rgb_kps, black_kps), axis=1)
+            # res = np.concatenate((yolo_map, kps_img), axis=0)
 
         return gray_results, black_results, dip_results, res

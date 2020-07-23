@@ -64,7 +64,7 @@ class HumanProcessor:
 
             tl, br = self.PEOPLE[idx].BOX.curr_box_location()
             if idx in self.RD_box_warning:
-                cv2.putText(im_box, "id{}: Not standing".format(idx), self.PEOPLE[idx].BOX.curr_top(),
+                cv2.putText(im_box, "id{}: Maybe not standing".format(idx), self.PEOPLE[idx].BOX.curr_top(),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 255), 2)
                 cv2.rectangle(im_box, tl, br, (255, 0, 255), 4)
             elif idx in self.RD_warning:
@@ -78,7 +78,8 @@ class HumanProcessor:
 
         # cv2.imshow("box size", img_black)
         im_box = cv2.resize(im_box, frame_size)
-        return np.concatenate((img_cnt, im_box), axis=0)
+        # return np.concatenate((img_cnt, im_box), axis=0)
+        return im_box
 
     def update_kps(self, id2ske):
         for k, v in id2ske.items():

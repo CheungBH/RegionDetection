@@ -24,7 +24,7 @@ class RegionDetector(object):
             self.gray_score_file = open("video/txt/gray_score/{}.txt".format(path.split("/")[-1][:-4]), "w")
 
         if write_video:
-            self.out_video = cv2.VideoWriter("output.mp4", cv2.VideoWriter_fourcc(*'XVID'), 15, (store_size[1], store_size[0]))
+            self.out_video = cv2.VideoWriter("output.mp4", cv2.VideoWriter_fourcc(*'XVID'), 15, store_size)
 
     def process(self):
         self.IP.object_tracker.init_tracker()
@@ -71,7 +71,7 @@ if __name__ == '__main__':
     # # src = "video/619_Big Group"
     # # for folder in os.listdir(src):
     # # video_folder = os.path.join(src, folder)
-    # video_folder = "D:/0619_BIG"
+    # video_folder = "D:/0619_bad"
     # dest_folder = video_folder + "_res"
     # os.makedirs(dest_folder, exist_ok=True)
     #

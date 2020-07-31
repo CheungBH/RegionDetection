@@ -22,6 +22,7 @@ except:
 
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 empty_tensor = torch.empty([0,7])
+empty_tensor4 = torch.empty([0,4])
 
 
 class ImgProcessor:
@@ -78,22 +79,20 @@ class ImgProcessor:
             img_black = cv2.resize(img_black, config.frame_size)
 
             merged_res = self.BE.ensemble_box(black_res, gray_res)
-
             merged_img = copy.deepcopy(frame_tmp)
+
             if len(merged_res) > 0:
                 merged_boxes, merged_scores = self.gray_yolo.cut_box_score(merged_res)
                 self.BBV.visualize(merged_boxes, merged_img, merged_scores)
-            cv2.imshow("merged", merged_img)
-
-            if len(merged_res) > 0:
                 self.id2bbox = self.object_tracker.track(merged_res)
                 boxes = self.object_tracker.id_and_box(self.id2bbox)
                 self.IDV.plot_bbox_id(self.id2bbox, frame)
                 img_black = paste_box(frame_tmp, img_black, boxes)
                 self.HP.update(self.id2bbox)
             else:
-                boxes = None
+                boxes = empty_tensor4
 
+            cv2.imshow("merged", merged_img)
             rd_map = self.RP.process_box(boxes, frame)
             warning_idx = self.RP.get_alarmed_box_id(self.id2bbox)
             danger_idx = self.HP.box_size_warning(warning_idx)

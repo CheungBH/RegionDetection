@@ -96,7 +96,7 @@ class RegionProcessor:
     def process_box(self, boxes, fr):
         self.clear()
         self.img = copy.deepcopy(fr)
-        if boxes is not None:
+        if len(boxes) > 0:
             center_ls, cover_ls, occupy_ls = self.region_classify(boxes)
             self.region_process(occupy_ls, cover_ls, center_ls)
         else:

@@ -103,7 +103,6 @@ class BoxEnsemble:
         self.pre_boxes = []
         self.max_box = 1
         self.black_max_thresh = height * width * 0.4
-        self.area_thresh = 30000
 
     def ensemble_box(self, black_res, gray_res):
 

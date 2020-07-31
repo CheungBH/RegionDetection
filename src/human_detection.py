@@ -56,9 +56,9 @@ class ImgProcessor:
             black_res = self.black_yolo.process(enhanced)
             if black_res is not None:
                 black_boxes, black_scores = self.black_yolo.cut_box_score(black_res)
-                enhanced = self.BBV.visualize(black_boxes, enhanced, black_scores)
                 black_boxes, black_scores, black_res = \
                     filter_box(black_boxes, black_scores, black_res, config.black_box_threshold)
+            enhanced = self.BBV.visualize(black_boxes, enhanced)
             black_results = [enhanced, black_boxes, black_scores]
 
             # gray pics process
@@ -66,10 +66,9 @@ class ImgProcessor:
             gray_res = self.gray_yolo.process(gray_img)
             if gray_res is not None:
                 gray_boxes, gray_scores = self.gray_yolo.cut_box_score(gray_res)
-                gray_img = self.BBV.visualize(gray_boxes, gray_img, gray_scores)
                 gray_boxes, gray_scores, gray_res = \
                     filter_box(gray_boxes, gray_scores, gray_res, config.gray_box_threshold)
-
+                gray_img = self.BBV.visualize(gray_boxes, gray_img)
             gray_results = [gray_img, gray_boxes, gray_scores]
 
             img_black = cv2.imread("src/black.jpg")

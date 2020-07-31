@@ -5,10 +5,12 @@ import numpy as np
 from utils.utils import write_file
 
 write_box = False
-write_video = True
+write_video = False
 
 frame_size = config.frame_size
 store_size = config.store_size
+black_img_path = r"D:\ensemble\front_black"
+gray_img_path = r"D:\ensemble\front_gray"
 
 
 class RegionDetector(object):
@@ -17,6 +19,8 @@ class RegionDetector(object):
         self.cap = cv2.VideoCapture(path)
         self.fgbg = cv2.createBackgroundSubtractorMOG2(history=500, varThreshold=200, detectShadows=False)
         self.IP = ImgProcessor()
+        self.video_name = path.split("\\")[-1][:-4]
+
         if write_box:
             self.black_file = open("video/txt/black/{}.txt".format(path.split("/")[-1][:-4]), "w")
             self.gray_file = open("video/txt/gray/{}.txt".format(path.split("/")[-1][:-4]), "w")
@@ -47,12 +51,16 @@ class RegionDetector(object):
                     self.out_video.write(res_map)
 
                 cv2.imshow("res", cv2.resize(res_map, (1440, 720)))
+                if cnt % 5 == 0 and cnt != 0:
+                    cv2.imwrite(os.path.join(black_img_path, self.video_name + "_{}.jpg".format(cnt)), black_res[0])
+                    cv2.imwrite(os.path.join(gray_img_path, self.video_name + "_{}.jpg".format(cnt)), gray_res[0])
+
                 # out.write(res)
                 cnt += 1
                 cv2.waitKey(1)
             else:
                 self.cap.release()
-                self.out_video.release()
+                # self.out_video.release()
                 cv2.destroyAllWindows()
                 # self.IP.RP.out.release()
                 break
@@ -71,9 +79,9 @@ if __name__ == '__main__':
     # src = "video/619_Big Group"
     # for folder in os.listdir(src):
     # video_folder = os.path.join(src, folder)
-    video_folder = "D:/0619_BIG"
-    dest_folder = video_folder + "_res"
-    os.makedirs(dest_folder, exist_ok=True)
+    video_folder = r"D:/0619_front_side/front"
+    # dest_folder = video_folder + "_res"
+    # os.makedirs(dest_folder, exist_ok=True)
 
     for v_name in os.listdir(video_folder):
         video = os.path.join(video_folder, v_name)
@@ -81,4 +89,4 @@ if __name__ == '__main__':
         RD.process()
 
         # shutil.copy("output2.mp4", os.path.join(dest_folder, "rd_" + v_name))
-        shutil.move("output.mp4", os.path.join(dest_folder, v_name))
+        # shutil.move("output.mp4", os.path.join(dest_folder, v_name))

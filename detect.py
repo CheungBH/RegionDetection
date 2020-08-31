@@ -5,10 +5,11 @@ import numpy as np
 from utils.utils import write_file
 
 write_box = False
-write_video = True
+write_video = False
 
 frame_size = config.frame_size
 store_size = config.store_size
+IP = ImgProcessor()
 
 
 class RegionDetector(object):
@@ -16,7 +17,6 @@ class RegionDetector(object):
         self.path = path
         self.cap = cv2.VideoCapture(path)
         self.fgbg = cv2.createBackgroundSubtractorMOG2(history=500, varThreshold=200, detectShadows=False)
-        self.IP = ImgProcessor()
         if write_box:
             self.black_file = open("video/txt/black/{}.txt".format(path.split("/")[-1][:-4]), "w")
             self.gray_file = open("video/txt/gray/{}.txt".format(path.split("/")[-1][:-4]), "w")
@@ -27,7 +27,7 @@ class RegionDetector(object):
             self.out_video = cv2.VideoWriter("output.mp4", cv2.VideoWriter_fourcc(*'XVID'), 15, store_size)
 
     def process(self):
-        self.IP.object_tracker.init_tracker()
+        IP.object_tracker.init_tracker()
         cnt = 0
         # fourcc = cv2.VideoWriter_fourcc(*'XVID')
         while True:
@@ -37,7 +37,7 @@ class RegionDetector(object):
                 fgmask = self.fgbg.apply(frame)
                 background = self.fgbg.getBackgroundImage()
 
-                gray_res, black_res, dip_res, res_map = self.IP.process_img(frame, background)
+                gray_res, black_res, dip_res, res_map = IP.process_img(frame, background)
 
                 if write_box:
                     write_file(gray_res, self.gray_file, self.gray_score_file)

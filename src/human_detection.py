@@ -8,7 +8,7 @@ from src.detector.image_process_detect import ImageProcessDetection
 # from src.detector.yolo_asff_detector import ObjectDetectionASFF
 from src.detector.visualize import BBoxVisualizer
 from src.utils.img import gray3D
-from src.detector.box_postprocess import crop_bbox, filter_box, BoxEnsemble
+from src.detector.box_postprocess import eliminate_nan, filter_box, BoxEnsemble
 from src.tracker.track import ObjectTracker
 from src.tracker.visualize import IDVisualizer
 from src.analyser.area import RegionProcessor
@@ -16,9 +16,11 @@ from src.analyser.humans import HumanProcessor
 from src.utils.utils import paste_box
 
 try:
-    from config.config import gray_yolo_cfg, gray_yolo_weights, black_yolo_cfg, black_yolo_weights, video_path
+    from config.config import gray_yolo_cfg, gray_yolo_weights, black_yolo_cfg, black_yolo_weights, video_path, \
+        black_box_threshold, gray_box_threshold
 except:
-    from src.debug.config.cfg_only_detections import gray_yolo_cfg, gray_yolo_weights, black_yolo_cfg, black_yolo_weights, video_path
+    from src.debug.config.cfg_only_detections import gray_yolo_cfg, gray_yolo_weights, black_yolo_cfg, \
+        black_yolo_weights, video_path, black_box_threshold, gray_box_threshold
 
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 empty_tensor = torch.empty([0,7])
@@ -33,23 +35,27 @@ class ImgProcessor:
         self.object_tracker = ObjectTracker()
         self.dip_detection = ImageProcessDetection()
         self.BBV = BBoxVisualizer()
-        self.IDV = IDVisualizer(with_bbox=False)
+        self.IDV = IDVisualizer()
         self.img = []
         self.id2bbox = {}
         self.img_black = []
         self.show_img = show_img
         self.RP = RegionProcessor(config.frame_size[0], config.frame_size[1], 10, 10)
-        self.HP = HumanProcessor()
+        self.HP = HumanProcessor(config.frame_size[0], config.frame_size[1])
         self.BE = BoxEnsemble()
 
     def process_img(self, frame, background):
+        rgb_kps, dip_img, track_pred, rd_box = \
+            copy.deepcopy(frame), copy.deepcopy(frame), copy.deepcopy(frame), copy.deepcopy(frame)
+        img_black = cv2.imread("src/black.jpg")
+        img_black = cv2.resize(img_black, config.frame_size)
+        iou_img, black_kps, img_size_ls, img_box_ratio, rd_cnt = copy.deepcopy(img_black), \
+            copy.deepcopy(img_black), copy.deepcopy(img_black), copy.deepcopy(img_black), copy.deepcopy(img_black)
+
         black_boxes, black_scores, gray_boxes, gray_scores = empty_tensor, empty_tensor, empty_tensor, empty_tensor
-        frame_tmp = copy.deepcopy(frame)
         diff = cv2.absdiff(frame, background)
-        dip_img = copy.deepcopy(frame)
+
         dip_boxes = self.dip_detection.detect_rect(diff)
-        # if len(dip_boxes) > 0:
-        #     dip_img = self.BBV.visualize(dip_boxes, dip_img)
         dip_results = [dip_img, dip_boxes]
 
         with torch.no_grad():
@@ -57,53 +63,47 @@ class ImgProcessor:
             enhance_kernel = np.array([[0, -1, 0], [0, 5, 0], [0, -1, 0]])
             enhanced = cv2.filter2D(diff, -1, enhance_kernel)
             black_res = self.black_yolo.process(enhanced)
-            if len(black_res) > 0:
+            if black_res is not None:
                 black_boxes, black_scores = self.black_yolo.cut_box_score(black_res)
-                enhanced = self.BBV.visualize(black_boxes, enhanced, black_scores)
+                self.BBV.visualize(black_boxes, enhanced, black_scores)
                 black_boxes, black_scores, black_res = \
-                    filter_box(black_boxes, black_scores, black_res, config.black_box_threshold)
+                    filter_box(black_boxes, black_scores, black_res, black_box_threshold)
             black_results = [enhanced, black_boxes, black_scores]
 
             # gray pics process
             gray_img = gray3D(frame)
             gray_res = self.gray_yolo.process(gray_img)
-            if len(gray_res) > 0:
+            if gray_res is not None:
                 gray_boxes, gray_scores = self.gray_yolo.cut_box_score(gray_res)
-                gray_img = self.BBV.visualize(gray_boxes, gray_img, gray_scores)
+                self.BBV.visualize(gray_boxes, gray_img, gray_scores)
                 gray_boxes, gray_scores, gray_res = \
-                    filter_box(gray_boxes, gray_scores, gray_res, config.gray_box_threshold)
-
+                    filter_box(gray_boxes, gray_scores, gray_res, gray_box_threshold)
             gray_results = [gray_img, gray_boxes, gray_scores]
 
-            img_black = cv2.imread("src/black.jpg")
-            img_black = cv2.resize(img_black, config.frame_size)
-
             merged_res = self.BE.ensemble_box(black_res, gray_res)
-            merged_img = copy.deepcopy(frame_tmp)
 
-            if len(merged_res) > 0:
-                merged_boxes, merged_scores = self.gray_yolo.cut_box_score(merged_res)
-                self.BBV.visualize(merged_boxes, merged_img, merged_scores)
-                self.id2bbox = self.object_tracker.track(merged_res)
-                boxes = self.object_tracker.id_and_box(self.id2bbox)
-                self.IDV.plot_bbox_id(self.id2bbox, frame)
-                img_black = paste_box(frame_tmp, img_black, boxes)
-                self.HP.update(self.id2bbox)
-            else:
-                boxes = empty_tensor4
+            self.id2bbox = self.object_tracker.track(merged_res)
+            self.id2bbox = eliminate_nan(self.id2bbox)
+            boxes = self.object_tracker.id_and_box(self.id2bbox)
+            self.IDV.plot_bbox_id(self.id2bbox, track_pred, color=("red", "purple"), with_bbox=True)
+            self.IDV.plot_bbox_id(self.object_tracker.get_pred(), track_pred, color=("yellow", "orange"), id_pos="down",
+                                  with_bbox=True)
 
-            cv2.imshow("merged", merged_img)
-            rd_map = self.RP.process_box(boxes, frame)
+            self.object_tracker.plot_iou_map(iou_img)
+            img_box_ratio = paste_box(rgb_kps, img_box_ratio, boxes)
+            self.HP.update(self.id2bbox)
+
+            self.RP.process_box(boxes, rd_box, rd_cnt)
             warning_idx = self.RP.get_alarmed_box_id(self.id2bbox)
-            danger_idx = self.HP.box_size_warning(warning_idx)
+            # danger_idx = self.HP.box_size_warning(warning_idx)
+            self.HP.vis_box_size(img_box_ratio, img_size_ls)
 
-            # danger_box = [v for k, v in self.id2bbox.items() if k in danger_idx]
-
-            box_map = self.HP.vis_box_size(img_black)
-            yolo_map = np.concatenate((enhanced, gray_img), axis=1)
-            yolo_cnt_map = np.concatenate((yolo_map, rd_map), axis=0)
-            res = np.concatenate((yolo_cnt_map, box_map), axis=1)
-
-            # cv2.imshow("black_box", img_black)
+            detection_map = np.concatenate((enhanced, gray_img), axis=1)
+            tracking_map = np.concatenate((track_pred, iou_img), axis=1)
+            row_1st_map = np.concatenate((detection_map, tracking_map), axis=1)
+            box_map = np.concatenate((img_box_ratio, img_size_ls), axis=1)
+            rd_map = np.concatenate((rd_cnt, rd_box), axis=1)
+            row_2nd_map = np.concatenate((rd_map, box_map), axis=1)
+            res = np.concatenate((row_1st_map, row_2nd_map), axis=0)
 
         return gray_results, black_results, dip_results, res

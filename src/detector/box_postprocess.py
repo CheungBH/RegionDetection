@@ -3,6 +3,7 @@ from ..utils.img import cropBox, im_to_torch
 from config import config
 import cv2
 from src.yolo.bbox import bbox_iou
+import numpy as np
 
 
 def crop_bbox(orig_img, boxes):
@@ -75,11 +76,11 @@ def right_distance(a, b):
 
 def cal_area(box):
     area = (box[2]-box[0])*(box[3]-box[1])
-    print(area)
+    # print(area)
     return area
 
 
-def nms(dets, conf=0.6):
+def nms(dets, conf=0.5):
     if len(dets) < 2:
         return dets
 
@@ -98,6 +99,14 @@ def nms(dets, conf=0.6):
     return torch.cat(max_detections)
 
 
+def eliminate_nan(id2box):
+    res = {}
+    for k, v in id2box.items():
+        if True not in np.isnan(v.numpy()):
+            res[k] = v
+    return res
+
+
 class BoxEnsemble:
     def __init__(self, height=config.frame_size[1], width=config.frame_size[0]):
         self.pre_boxes = []
@@ -105,11 +114,9 @@ class BoxEnsemble:
         self.black_max_thresh = height * width * 0.4
 
     def ensemble_box(self, black_res, gray_res):
-
-        black_keep = self.keep_small(black_res[:,:4], self.black_max_thresh)
+        black_keep = self.keep_small(black_res[:, :4], self.black_max_thresh)
         # gray_keep = self.analyse_area(gray_res[:,:4], "b")
         # merged_res = torch.cat((black_res[black_keep], gray_res[gray_keep]), dim=0)
-
         merged_res = torch.cat((black_res[black_keep], gray_res), dim=0)
         merged_res = nms(merged_res)
         return merged_res

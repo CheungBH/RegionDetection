@@ -1,18 +1,13 @@
 import numpy as np
 import cv2
 import torch
-import scipy.misc
-from torchvision import transforms
-import torch.nn.functional as F
 from scipy.ndimage import maximum_filter
 
-from PIL import Image
-from copy import deepcopy
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 
-# from config.config import pose_cls
+from config.config import pose_cls
 
 
 def im_to_torch(img):
@@ -32,6 +27,11 @@ def torch_to_im(img):
 def cut_image(img, bottom=0, top=0, left=0, right=0):
     height, width = img.shape[0], img.shape[1]
     return np.asarray(img[top: height - bottom, left: width - right])
+
+
+def cut_image_with_box(img, bottom=0, top=0, left=0, right=0):
+    height, width = img.shape[0], img.shape[1]
+    return np.asarray(img[top: bottom, left: right])
 
 
 def load_image(img_path):
@@ -227,32 +227,32 @@ def transformBoxInvert(pt, ul, br, inpH, inpW, resH, resW):
     new_point[0] = _pt[0] + ul[0]
     new_point[1] = _pt[1] + ul[1]
     return new_point
-#
-#
-# def transformBoxInvert_batch(pt, ul, br, inpH, inpW, resH, resW):
-#     '''
-#     pt:     [n, 17, 2]
-#     ul:     [n, 2]
-#     br:     [n, 2]
-#     '''
-#     center = (br - 1 - ul) / 2
-#
-#     size = br - ul
-#     size[:, 0] *= (inpH / inpW)
-#
-#     lenH, _ = torch.max(size, dim=1)   # [n,]
-#     lenW = lenH * (inpW / inpH)
-#
-#     _pt = (pt * lenH[:, np.newaxis, np.newaxis]) / resH
-#     _pt[:, :, 0] = _pt[:, :, 0] - ((lenW[:, np.newaxis].repeat(1, pose_cls) - 1) /
-#                                    2 - center[:, 0].unsqueeze(-1).repeat(1, pose_cls)).clamp(min=0)
-#     _pt[:, :, 1] = _pt[:, :, 1] - ((lenH[:, np.newaxis].repeat(1, pose_cls) - 1) /
-#                                    2 - center[:, 1].unsqueeze(-1).repeat(1, pose_cls)).clamp(min=0)
-#
-#     new_point = torch.zeros(pt.size())
-#     new_point[:, :, 0] = _pt[:, :, 0] + ul[:, 0].unsqueeze(-1).repeat(1, pose_cls)
-#     new_point[:, :, 1] = _pt[:, :, 1] + ul[:, 1].unsqueeze(-1).repeat(1, pose_cls)
-#     return new_point
+
+
+def transformBoxInvert_batch(pt, ul, br, inpH, inpW, resH, resW):
+    '''
+    pt:     [n, 17, 2]
+    ul:     [n, 2]
+    br:     [n, 2]
+    '''
+    center = (br - 1 - ul) / 2
+
+    size = br - ul
+    size[:, 0] *= (inpH / inpW)
+
+    lenH, _ = torch.max(size, dim=1)   # [n,]
+    lenW = lenH * (inpW / inpH)
+
+    _pt = (pt * lenH[:, np.newaxis, np.newaxis]) / resH
+    _pt[:, :, 0] = _pt[:, :, 0] - ((lenW[:, np.newaxis].repeat(1, pose_cls) - 1) /
+                                   2 - center[:, 0].unsqueeze(-1).repeat(1, pose_cls)).clamp(min=0)
+    _pt[:, :, 1] = _pt[:, :, 1] - ((lenH[:, np.newaxis].repeat(1, pose_cls) - 1) /
+                                   2 - center[:, 1].unsqueeze(-1).repeat(1, pose_cls)).clamp(min=0)
+
+    new_point = torch.zeros(pt.size())
+    new_point[:, :, 0] = _pt[:, :, 0] + ul[:, 0].unsqueeze(-1).repeat(1, pose_cls)
+    new_point[:, :, 1] = _pt[:, :, 1] + ul[:, 1].unsqueeze(-1).repeat(1, pose_cls)
+    return new_point
 
 
 def cropBox(img, ul, br, resH, resW):
@@ -510,14 +510,18 @@ def processPeaks(candidate_points, hm, pt1, pt2, inpH, inpW, resH, resW):
     return res_pts
 
 
-def calibration(img, height=1080, width=1960):
+def calibration(img):
+    height, width = img.shape[0], img.shape[1]
+    default_h, default_w = 1080, 1920
+    ratio_h, ratio_w = default_h/height, default_w/width
     mtx = np.array([[1579.0065371804494, 0.0, 1024.3801185727802], [0.0, 1697.5003831087758, 542.5693125986955],
                     [0.0, 0.0, 1.0]])
     dist = np.array([[-0.6002237880679471], [0.36856632181945537], [-0.0018543577826724245], [-0.021979596228714066]
                         , [-0.15631462404369234]])
     K = np.array \
-        ([[1065.9876632048952, 0.0, 970.0351475014528], [0.0, 1051.0552629200934, 533.2306815660671], [0.0, 0.0, 1.0]])
-    D = np.array([[0.09852134322204922], [0.0040876124771701385], [-0.14887184687293656], [0.07885494560173759]])
+        ([[1065.9876632048952, 0.0, 970.0351475014528], [0.0, 1051.0552629200934, 533.2306815660671], [0.0, 0.0, 1.0]])\
+        /ratio_h
+    D = np.array([[0.09852134322204922], [0.0040876124771701385], [-0.14887184687293656], [0.07885494560173759]])/ratio_w
     # width, height = 1960, 1080
     P = cv2.fisheye.estimateNewCameraMatrixForUndistortRectify(K, D, (width, height), None)
     mapx2, mapy2 = cv2.fisheye.initUndistortRectifyMap(K, D, None, P, (width, height), cv2.CV_32F)

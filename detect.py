@@ -9,14 +9,18 @@ write_video = False
 
 frame_size = config.frame_size
 store_size = config.store_size
-IP = ImgProcessor()
+resize_ratio = config.resize_ratio
+show_size = config.show_size
 
 
 class RegionDetector(object):
     def __init__(self, path):
-        self.path = path
         self.cap = cv2.VideoCapture(path)
         self.fgbg = cv2.createBackgroundSubtractorMOG2(history=500, varThreshold=200, detectShadows=False)
+        self.height, self.width = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)), int(
+            self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        self.resize_size = (int(self.width * resize_ratio), int(self.height * resize_ratio))
+        self.IP = ImgProcessor(self.resize_size)
         if write_box:
             self.black_file = open("video/txt/black/{}.txt".format(path.split("/")[-1][:-4]), "w")
             self.gray_file = open("video/txt/gray/{}.txt".format(path.split("/")[-1][:-4]), "w")
@@ -27,17 +31,16 @@ class RegionDetector(object):
             self.out_video = cv2.VideoWriter("output.mp4", cv2.VideoWriter_fourcc(*'XVID'), 15, store_size)
 
     def process(self):
-        IP.object_tracker.init_tracker()
+        self.IP.init()
         cnt = 0
         # fourcc = cv2.VideoWriter_fourcc(*'XVID')
         while True:
             ret, frame = self.cap.read()
             if ret:
-                frame = cv2.resize(frame, config.frame_size)
+                frame = cv2.resize(frame, self.resize_size)
                 fgmask = self.fgbg.apply(frame)
                 background = self.fgbg.getBackgroundImage()
-
-                gray_res, black_res, dip_res, res_map = IP.process_img(frame, background)
+                gray_res, black_res, dip_res, res_map = self.IP.process_img(frame, background)
 
                 if write_box:
                     write_file(gray_res, self.gray_file, self.gray_score_file)
@@ -46,7 +49,7 @@ class RegionDetector(object):
                 if write_video:
                     self.out_video.write(res_map)
 
-                cv2.imshow("res", cv2.resize(res_map, (1440, 720)))
+                cv2.imshow("res", cv2.resize(res_map, show_size))
                 # out.write(res)
                 cnt += 1
                 cv2.waitKey(1)

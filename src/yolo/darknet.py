@@ -29,7 +29,7 @@ class test_net(nn.Module):
         x = x.view(-1)
         fwd = nn.Sequential(self.linear_1, *self.middle, self.output)
         return fwd(x)
-        
+
 def get_test_input():
     img = cv2.imread("dog-cycle-car.png")
     img = cv2.resize(img, (416,416)) 
@@ -149,6 +149,18 @@ class ReOrgLayer(nn.Module):
         return x
 
 
+class Swish(nn.Module):
+    def __init__(self):
+        super(Swish, self).__init__()
+
+    def forward(self, x):
+        return x * torch.sigmoid(x)
+
+
+class Mish(nn.Module):  # https://github.com/digantamisra98/Mish
+    def forward(self, x):
+        return x.mul_(F.softplus(x).tanh())
+
 def create_modules(blocks):
     net_info = blocks[0]     #Captures the information about the input and pre-processing    
     
@@ -202,6 +214,10 @@ def create_modules(blocks):
             if activation == "leaky":
                 activn = nn.LeakyReLU(0.1, inplace = True)
                 module.add_module("leaky_{0}".format(index), activn)
+            elif activation == 'mish':
+                module.add_module('activation', Mish())
+            elif activation == 'swish':
+                module.add_module('activation', Swish())
             
             
             

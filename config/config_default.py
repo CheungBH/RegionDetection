@@ -1,53 +1,70 @@
-device = "cuda:0"
+import torch
+import os
 
-gray_yolo_cfg = "weights/yolo/finetuned/0909_test-test1-best-ALL-prune_0.98_keep_0.01_18_shortcut/prune_0.98_keep_0.01_18_shortcut.cfg"
-gray_yolo_weights = "weights/yolo/finetuned/0909_test-test1-best-ALL-prune_0.98_keep_0.01_18_shortcut/best.weights"
-black_yolo_cfg = "weights/yolo/0710/black/yolov3-spp-1cls.cfg"
-black_yolo_weights = "weights/yolo/0710/black/150_416_best.weights"
-rgb_yolo_cfg = ""
-rgb_yolo_weights = ""
 
-pose_weight = "weights/sppe/duc_se.pth"
-pose_cfg = None
+"-------------------Outer configuration-----------------------"
 
-video_path = "video/0507_mul_01.mp4"
+video_path = "video/underwater/vlc-record-2020-07-03-11h28m47s-1.avi-.mp4"
+
+gray_yolo_cfg = "model/yolo/gray/1010/yolov3-spp-1cls-leaky.cfg"
+gray_yolo_weights = "model/yolo/gray/1010/best.weights"
+black_yolo_cfg = "model/yolo/black/1010/yolov3-original-1cls-leaky.cfg"
+black_yolo_weights = "model/yolo/black/1010/best.weights"
+black_box_threshold = 0.5122
+gray_box_threshold = 0.526
+
+img_folder = "img/squat"
 water_top = 40
 
-RNN_frame_length = 4
-RNN_backbone = "TCN"
-RNN_class = ["stand", "drown"]
-RNN_weight = "weights/RNN/TCN_struct1_2020-07-08-20-02-32.pth"
-TCN_single = True
+CNN_weight = "model/CNN/underwater/1/1_mobilenet_9_decay1.pth"
 
-'''
-----------------------------------------------------------------------------------------------------------------
-'''
+write_video = False
+write_box = False
+write_kps = False
 
-# For yolo
-confidence = 0.4
+resize_ratio = 0.5
+show_size = (1440, 840)
+store_size = (3840, 2160)
+
+
+"-------------------Inner configuration-----------------------"
+
+device = "cuda:0"
+print("Using {}".format(device))
+
+confidence = 0.8
 num_classes = 80
 nms_thresh = 0.33
 input_size = 416
 
-# For pose estimation
-input_height = 320
-input_width = 256
-output_height = 80
-output_width = 64
-fast_inference = True
-pose_batch = 80
 
-pose_backbone = "seresnet101"
-pose_cls = 17
-DUCs = [480, 240]
+track_idx = "all"    # If all idx, track_idx = "all"
+track_plot_id = ["all"]   # If all idx, track_plot_id = ["all"]
+assert track_idx == "all" or isinstance(track_idx, int)
+
+plot_bbox = True
+plot_kps = True
+plot_id = True
+
+libtorch = False
 
 
-# For detection
-frame_size = (720, 540)
-resize_ratio = 0.5
-store_size = (frame_size[0]*4, frame_size[1]*2)
-show_size = (1560, 720)
+"----------------------------Set inner configuration with opt-------------------------"
 
-black_box_threshold = 0.3
-gray_box_threshold = 0.2
+from src.opt import opt
+
+opt.device = device
+
+opt.confidence = confidence
+opt.num_classes = num_classes
+opt.nms_thresh = nms_thresh
+opt.input_size = input_size
+
+opt.libtorch = libtorch
+
+opt.plot_bbox = plot_bbox
+opt.plot_kps = plot_kps
+opt.plot_id = plot_id
+opt.track_id = track_idx
+opt.track_plot_id = track_plot_id
 

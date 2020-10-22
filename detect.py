@@ -4,10 +4,9 @@ from src.human_detection import ImgProcessor
 import numpy as np
 from utils.utils import write_file
 
-write_box = False
-write_video = False
+write_box = config.write_box
+write_video = config.write_video
 
-frame_size = config.frame_size
 store_size = config.store_size
 resize_ratio = config.resize_ratio
 show_size = config.show_size

@@ -7,7 +7,6 @@ import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 
-
 from src.opt import opt
 pose_cls = opt.pose_cls
 

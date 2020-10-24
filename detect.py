@@ -20,13 +20,13 @@ class RegionDetector(object):
             self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.resize_size = (int(self.width * resize_ratio), int(self.height * resize_ratio))
         self.IP = ImgProcessor(self.resize_size)
-        if write_box:
+        if config.write_box:
             self.black_file = open("video/txt/black/{}.txt".format(path.split("/")[-1][:-4]), "w")
             self.gray_file = open("video/txt/gray/{}.txt".format(path.split("/")[-1][:-4]), "w")
             self.black_score_file = open("video/txt/black_score/{}.txt".format(path.split("/")[-1][:-4]), "w")
             self.gray_score_file = open("video/txt/gray_score/{}.txt".format(path.split("/")[-1][:-4]), "w")
 
-        if write_video:
+        if config.write_video:
             self.out_video = cv2.VideoWriter("output.mp4", cv2.VideoWriter_fourcc(*'XVID'), 15, store_size)
 
     def process(self):
@@ -41,11 +41,11 @@ class RegionDetector(object):
                 background = self.fgbg.getBackgroundImage()
                 gray_res, black_res, dip_res, res_map = self.IP.process_img(frame, background)
 
-                if write_box:
+                if config.write_box:
                     write_file(gray_res, self.gray_file, self.gray_score_file)
                     write_file(black_res, self.black_file, self.black_score_file)
 
-                if write_video:
+                if config.write_video:
                     self.out_video.write(res_map)
 
                 cv2.imshow("res", cv2.resize(res_map, show_size))

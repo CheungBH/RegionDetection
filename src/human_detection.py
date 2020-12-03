@@ -96,7 +96,7 @@ class ImgProcessor:
             #     self.BBV.visualize(trt_boxes, trt_box_img, trt_scores)
             # except:
             #     pass
-            # merged_res =
+            # merged_res = torch.cat(trt_boxes, trt_scores, trt_cls. torch.zeros(len(trt_boxes),1), axis=1)
 
             self.id2bbox = self.object_tracker.track(merged_res)
             self.id2bbox = eliminate_nan(self.id2bbox)

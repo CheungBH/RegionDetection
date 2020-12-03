@@ -9,6 +9,8 @@ import copy
 from src.detector.yolo_detect import ObjectDetectionYolo
 from src.detector.image_process_detect import ImageProcessDetection
 # from src.detector.yolo_asff_detector import ObjectDetectionASFF
+# For nano jetson
+# from src.detector.yolo_trt_detect import TrtYOLO
 from src.detector.visualize import BBoxVisualizer
 from src.utils.img import gray3D
 from src.detector.box_postprocess import eliminate_nan, filter_box, BoxEnsemble
@@ -28,6 +30,8 @@ class ImgProcessor:
     def __init__(self, resize_size, show_img=True):
         self.black_yolo = ObjectDetectionYolo(cfg=config.black_yolo_cfg, weight=config.black_yolo_weights)
         self.gray_yolo = ObjectDetectionYolo(cfg=config.gray_yolo_cfg, weight=config.gray_yolo_weights)
+        # For nano jetson
+        # self.yolo_trt = TrtYOLO(model_path, (720, 540), 1)
         self.BBV = BBoxVisualizer()
         self.object_tracker = ObjectTracker()
         self.dip_detection = ImageProcessDetection()
@@ -84,6 +88,15 @@ class ImgProcessor:
             gray_results = [gray_img, gray_boxes, gray_scores]
 
             merged_res = self.BE.ensemble_box(black_res, gray_res)
+
+            # For nano jetson
+            # trt_box_img = copy.deepcopy(frame)
+            # trt_boxes, trt_scores, trt_cls = self.yolo_trt.detect(frame)
+            # try:
+            #     self.BBV.visualize(trt_boxes, trt_box_img, trt_scores)
+            # except:
+            #     pass
+            # merged_res =
 
             self.id2bbox = self.object_tracker.track(merged_res)
             self.id2bbox = eliminate_nan(self.id2bbox)

@@ -4,12 +4,12 @@ import os
 
 "-------------------Outer configuration-----------------------"
 
-video_path = "video/underwater/vlc-record-2020-07-03-11h28m47s-1.avi-.mp4"
-
-gray_yolo_cfg = "model/yolo/gray/1010/yolov3-spp-1cls-leaky.cfg"
-gray_yolo_weights = "model/yolo/gray/1010/best.weights"
-black_yolo_cfg = "model/yolo/black/1010/yolov3-original-1cls-leaky.cfg"
-black_yolo_weights = "model/yolo/black/1010/best.weights"
+video_path = "video/sample/0048.mp4"
+gray_yolo_cfg = "weights/yolo/finetuned/0909_test-test1-best-ALL-prune_0.96_keep_0.01_15_" \
+                "shortcut/prune_0.96_keep_0.01_15_shortcut.cfg"
+gray_yolo_weights = "weights/yolo/finetuned/0909_test-test1-best-ALL-prune_0.96_keep_0.01_15_shortcut/best.weights"
+black_yolo_cfg = "weights/yolo/black/yolov3-spp-1cls.cfg"
+black_yolo_weights = "weights/yolo/black/best_converted.weights"
 black_box_threshold = 0.5122
 gray_box_threshold = 0.526
 
@@ -19,11 +19,11 @@ water_top = 40
 CNN_weight = "model/CNN/underwater/1/1_mobilenet_9_decay1.pth"
 
 write_video = False
-write_box = False
+write_box = True
 write_kps = False
 
 resize_ratio = 0.5
-show_size = (1440, 840)
+show_size = (1280, 640)
 store_size = (3840, 2160)
 
 

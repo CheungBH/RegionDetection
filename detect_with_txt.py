@@ -8,12 +8,20 @@ import numpy as np
 import cv2
 from config.config import video_path
 
+store_size = config.store_size
+resize_ratio = config.resize_ratio
+show_size = config.show_size
+
 
 class DrownDetector(object):
     def __init__(self, path):
         self.BBV = BBoxVisualizer()
         self.dip_detection = ImageProcessDetection()
         self.cap = cv2.VideoCapture(path)
+        self.height, self.width = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)), int(
+            self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        self.resize_size = (int(self.width * resize_ratio), int(self.height * resize_ratio))
+
         self.fgbg = cv2.createBackgroundSubtractorMOG2(history=500, varThreshold=200, detectShadows=False)
         with open("Video/txt/black/{}.txt".format(path.split("/")[-1][:-4]), "r") as bf:
             self.black_boxes = [line[:-1] for line in bf.readlines()]
@@ -32,7 +40,7 @@ class DrownDetector(object):
             ret, frame = self.cap.read()
             ret2, processed_frame = self.cap_processed.read()
             if ret:
-                frame = cv2.resize(frame, config.frame_size)
+                frame = cv2.resize(frame, self.resize_size)
                 gray_frame = gray3D(frame)
                 fgmask = self.fgbg.apply(frame)
                 background = self.fgbg.getBackgroundImage()
@@ -56,7 +64,7 @@ class DrownDetector(object):
                             if s > config.black_box_threshold:
                                 filtered_black_boxes.append(b)
                                 filtered_black_scores.append(s)
-                        enhanced = self.BBV.visualize(filtered_black_boxes, enhanced, filtered_black_scores)
+                        self.BBV.visualize(filtered_black_boxes, enhanced, filtered_black_scores)
 
                     gray_boxes = str2box(self.gray_boxes.pop(0))
                     gray_scores = str2score(self.gray_scores.pop(0))
@@ -67,7 +75,7 @@ class DrownDetector(object):
                             if s > config.gray_box_threshold:
                                 filtered_gray_boxes.append(b)
                                 filtered_gray_scores.append(s)
-                        gray_frame = self.BBV.visualize(filtered_gray_boxes, gray_frame, filtered_gray_scores)
+                        self.BBV.visualize(filtered_gray_boxes, gray_frame, filtered_gray_scores)
 
                 # cv2.imshow("dip_result", dip_img)
                 # cv2.moveWindow("dip_result", 0, 200)

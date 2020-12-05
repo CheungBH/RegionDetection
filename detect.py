@@ -21,10 +21,10 @@ class RegionDetector(object):
         self.resize_size = (int(self.width * resize_ratio), int(self.height * resize_ratio))
         self.IP = ImgProcessor(self.resize_size)
         if config.write_box:
-            self.black_file = open("video/txt/black/{}.txt".format(path.split("/")[-1][:-4]), "w")
-            self.gray_file = open("video/txt/gray/{}.txt".format(path.split("/")[-1][:-4]), "w")
-            self.black_score_file = open("video/txt/black_score/{}.txt".format(path.split("/")[-1][:-4]), "w")
-            self.gray_score_file = open("video/txt/gray_score/{}.txt".format(path.split("/")[-1][:-4]), "w")
+            self.black_file = open(path.replace(path.split("/")[-1], "black.txt"), "w")
+            self.gray_file = open(path.replace(path.split("/")[-1], "gray.txt"), "w")
+            self.black_score_file = open(path.replace(path.split("/")[-1], "black_score.txt"), "w")
+            self.gray_score_file = open(path.replace(path.split("/")[-1], "gray_score.txt"), "w")
 
         if config.write_video:
             self.out_video = cv2.VideoWriter("output.mp4", cv2.VideoWriter_fourcc(*'XVID'), 15, store_size)

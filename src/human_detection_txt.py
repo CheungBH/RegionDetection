@@ -108,7 +108,7 @@ class ImgProcessor:
 
             # tracking
             '''
-            self.id2bbox is the interface
+            self.id2bbox is the api of detection and alarm 
             '''
             self.id2bbox = self.object_tracker.track(merged_res)
             self.id2bbox = eliminate_nan(self.id2bbox)

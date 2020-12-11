@@ -54,12 +54,14 @@ class ImgProcessor:
         self.resize_size = resize_size
 
     def init(self):
+        # Initialize all the status
         self.RP = RegionProcessor(self.resize_size[0], self.resize_size[1], 10, 10)
         self.HP = HumanProcessor(self.resize_size[0], self.resize_size[1])
         self.object_tracker = ObjectTracker()
         self.object_tracker.init_tracker()
 
     def process_img(self, frame, background):
+        # Initial the images
         rgb_kps, dip_img, track_pred, rd_box = \
             copy.deepcopy(frame), copy.deepcopy(frame), copy.deepcopy(frame), copy.deepcopy(frame)
         img_black = np.full((self.resize_size[1], self.resize_size[0], 3), 0).astype(np.uint8)
@@ -69,11 +71,8 @@ class ImgProcessor:
         [black_boxes, black_scores, gray_boxes, gray_scores, black_res, gray_res] = [empty_tensor] * 6
         diff = cv2.absdiff(frame, background)
 
-        dip_boxes = self.dip_detection.detect_rect(diff)
-        dip_results = [dip_img, dip_boxes]
-
         with torch.no_grad():
-            # black picture
+            # black image process
             enhance_kernel = np.array([[0, -1, 0], [0, 5, 0], [0, -1, 0]])
             enhanced = cv2.filter2D(diff, -1, enhance_kernel)
             black_boxes = str2box(self.black_boxes.pop(0))
@@ -89,7 +88,7 @@ class ImgProcessor:
                     filter_box(black_boxes, black_scores, black_res, config.black_box_threshold)
             black_results = [enhanced, black_boxes, black_scores]
 
-            # gray pics process
+            # gray image process
             gray_img = gray3D(frame)
             gray_boxes = str2box(self.gray_boxes.pop(0))
             gray_scores = str2score(self.gray_scores.pop(0))
@@ -104,8 +103,13 @@ class ImgProcessor:
                     filter_box(gray_boxes, gray_scores, gray_res, config.gray_box_threshold)
             gray_results = [gray_img, gray_boxes, gray_scores]
 
+            # merge gray and black image
             merged_res = self.BE.ensemble_box(black_res, gray_res)
 
+            # tracking
+            '''
+            self.id2bbox is the interface
+            '''
             self.id2bbox = self.object_tracker.track(merged_res)
             self.id2bbox = eliminate_nan(self.id2bbox)
             boxes = self.object_tracker.id_and_box(self.id2bbox)
@@ -113,15 +117,19 @@ class ImgProcessor:
             self.IDV.plot_bbox_id(self.object_tracker.get_pred(), track_pred, color=("yellow", "orange"), id_pos="down",
                                   with_bbox=True)
 
+            # draw tracking images
             self.object_tracker.plot_iou_map(iou_img)
             img_box_ratio = paste_box(rgb_kps, img_box_ratio, boxes)
             self.HP.update(self.id2bbox)
 
+            # Region process
             self.RP.process_box(boxes, rd_box, rd_cnt)
             warning_idx = self.RP.get_alarmed_box_id(self.id2bbox)
-            # danger_idx = self.HP.box_size_warning(warning_idx)
+
+            # h-w ratio visualize
             self.HP.vis_box_size(img_box_ratio, img_size_ls)
 
+            # Concat the box
             detection_map = np.concatenate((enhanced, gray_img), axis=1)
             tracking_map = np.concatenate((track_pred, iou_img), axis=1)
             row_1st_map = np.concatenate((detection_map, tracking_map), axis=1)
@@ -130,4 +138,4 @@ class ImgProcessor:
             row_2nd_map = np.concatenate((rd_map, box_map), axis=1)
             res = np.concatenate((row_1st_map, row_2nd_map), axis=0)
 
-        return gray_results, black_results, dip_results, res
+        return gray_results, black_results, 0, res

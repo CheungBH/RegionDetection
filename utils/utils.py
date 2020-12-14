@@ -84,7 +84,7 @@ def score2str(scores):
 def str2score(string):
     if string == "":
         return None
-    return [[float(item) for item in string.split(",")]]
+    return [[float(item)] for item in string.split(",")]
 
 
 def write_file(res, box_f, score_f):

@@ -75,18 +75,6 @@ class ImgProcessor:
             # black image process
             enhance_kernel = np.array([[0, -1, 0], [0, 5, 0], [0, -1, 0]])
             enhanced = cv2.filter2D(diff, -1, enhance_kernel)
-            black_boxes = str2box(self.black_boxes.pop(0))
-            black_scores = str2score(self.black_scores.pop(0))
-            if black_boxes is not None:
-                black_boxes = torch.Tensor(black_boxes)
-                black_scores = torch.Tensor(black_scores)
-                black_res = torch.cat((black_boxes, black_scores, torch.ones(len(black_boxes),1),
-                                       torch.zeros(len(black_boxes),1)), axis=1)
-                # black_res = [black_boxes[idx] + [black_scores[idx]] + [0.999, 0] for idx in range(len(black_boxes))]
-                self.BBV.visualize(black_boxes, enhanced, black_scores)
-                black_boxes, black_scores, black_res = \
-                    filter_box(black_boxes, black_scores, black_res, config.black_box_threshold)
-            black_results = [enhanced, black_boxes, black_scores]
 
             # gray image process
             gray_img = gray3D(frame)
@@ -97,20 +85,17 @@ class ImgProcessor:
                 gray_scores = torch.Tensor(gray_scores)
                 gray_res = torch.cat((gray_boxes, gray_scores, torch.ones(len(gray_boxes),1),
                                       torch.zeros(len(gray_boxes),1)), axis=1)
-                #gray_res = [gray_boxes[idx] + [gray_scores[idx]] + [0.999, 0] for idx in range(len(gray_boxes))]
                 self.BBV.visualize(gray_boxes, gray_img, gray_scores)
                 gray_boxes, gray_scores, gray_res = \
                     filter_box(gray_boxes, gray_scores, gray_res, config.gray_box_threshold)
             gray_results = [gray_img, gray_boxes, gray_scores]
 
-            # merge gray and black image
-            merged_res = self.BE.ensemble_box(black_res, gray_res)
 
             # tracking
             '''
             self.id2bbox is the api of detection and alarm 
             '''
-            self.id2bbox = self.object_tracker.track(merged_res)
+            self.id2bbox = self.object_tracker.track(gray_res)
             self.id2bbox = eliminate_nan(self.id2bbox)
             boxes = self.object_tracker.id_and_box(self.id2bbox)
             self.IDV.plot_bbox_id(self.id2bbox, track_pred, color=("red", "purple"), with_bbox=True)
@@ -138,4 +123,4 @@ class ImgProcessor:
             row_2nd_map = np.concatenate((rd_map, box_map), axis=1)
             res = np.concatenate((row_1st_map, row_2nd_map), axis=0)
 
-        return gray_results, black_results, 0, res
+        return gray_results, 0, 0, res

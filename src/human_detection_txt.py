@@ -98,6 +98,8 @@ class ImgProcessor:
             self.id2bbox = self.object_tracker.track(gray_res)
             self.id2bbox = eliminate_nan(self.id2bbox)
             boxes = self.object_tracker.id_and_box(self.id2bbox)
+
+            # Draw tracking images
             self.IDV.plot_bbox_id(self.id2bbox, track_pred, color=("red", "purple"), with_bbox=True)
             self.IDV.plot_bbox_id(self.object_tracker.get_pred(), track_pred, color=("yellow", "orange"), id_pos="down",
                                   with_bbox=True)
@@ -105,13 +107,13 @@ class ImgProcessor:
             # draw tracking images
             self.object_tracker.plot_iou_map(iou_img)
             img_box_ratio = paste_box(rgb_kps, img_box_ratio, boxes)
-            self.HP.update(self.id2bbox)
 
             # Region process
             self.RP.process_box(boxes, rd_box, rd_cnt)
-            warning_idx = self.RP.get_alarmed_box_id(self.id2bbox)
+            # warning_idx = self.RP.get_alarmed_box_id(self.id2bbox)
 
             # h-w ratio visualize
+            self.HP.update(self.id2bbox)
             self.HP.vis_box_size(img_box_ratio, img_size_ls)
 
             # Concat the box
